@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.2
+// @version      2.0.3
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -54,8 +54,6 @@ GM_xmlhttpRequest({
 
 // KITTY mod
 var modVersion = GM_info.script.version;
-
-$("#time-hud").attr("style", "display: none;");
 
 setTimeout(function(){ //do what you need here
 
