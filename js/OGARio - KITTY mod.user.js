@@ -53,7 +53,7 @@ GM_xmlhttpRequest({
 });
 
 // KITTY mod
-var modVersion = "2";
+var modVersion = GM_info.script.version;
 
 setTimeout(function(){ //do what you need here
 
