@@ -139,7 +139,7 @@ setTimeout(function(){ //do what you need here
 
     $("#copyLeaderboardBtn").attr("style",'width: 50%;text-shadow: 0.3px 0.3px #000000; font-size: small; margin-top: 0px;border-top-color: '+$(".main-color").css("color")+';border-bottom-style: none; border-left-style: none;border-right-style: none; margin-top: 5px;');
 
-    //$("#version").before('<div id="modVersion" class="main-color" style="float:left;margin-top:10px;font-weight: 700;">KITTY mod v' + modVersion + '</div>');
+    $("#version").before('<div id="modVersion" class="main-color" style="float:left;margin-top:10px;font-weight: 700;">KITTY mod v' + modVersion + '</div>');
 
     $("#minimap-sectors").attr("style", "opacity: 0.25;");
 
