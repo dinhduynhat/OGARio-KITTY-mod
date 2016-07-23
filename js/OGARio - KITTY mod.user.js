@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.1
+// @version      2.0.2
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -103,7 +103,7 @@ setTimeout(function(){ //do what you need here
     $("#create-party-btn").prop('title', "Create party");
     $("#create-party-btn").attr('data-toggle', "tooltip");
 
-    $("#join-party-btn").html('<span class="glyphicon glyphicon-save"></span>');
+    //$("#join-party-btn").html('<span class="glyphicon glyphicon-save"></span>');
     $("#join-party-btn").prop('title', "Join party");
     $("#join-party-btn").attr('data-toggle', "tooltip");
 
