@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.2
+// @version      2.0
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -103,7 +103,7 @@ setTimeout(function(){ //do what you need here
     $("#create-party-btn").prop('title', "Create party");
     $("#create-party-btn").attr('data-toggle', "tooltip");
 
-    //$("#join-party-btn").html('<span class="glyphicon glyphicon-save"></span>');
+    $("#join-party-btn").html('<span class="glyphicon glyphicon-save"></span>');
     $("#join-party-btn").prop('title', "Join party");
     $("#join-party-btn").attr('data-toggle', "tooltip");
 
@@ -125,9 +125,6 @@ setTimeout(function(){ //do what you need here
 
     $("#searchInput").attr('style', 'margin-bottom: 10px; float: left; width: 65% !important');
     $('[data-toggle="tooltip"]').tooltip();
-
-    //toastr.success('<span class="message-nick main-color">M. D. (ZEUS): </span>kitty is the best!');
-    //toastr.success('<span class="message-nick main-color">Skype: </span>signed in as ' + app.personsAndGroupsManager.mePerson.displayName());
 
     $("#overlays").removeAttr('style');
     $("#overlays").attr('style', 'position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 100;');
