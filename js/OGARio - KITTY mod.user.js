@@ -55,6 +55,8 @@ GM_xmlhttpRequest({
 // KITTY mod
 var modVersion = GM_info.script.version;
 
+$("#time-hud").attr("style", "display: none;");
+
 setTimeout(function(){ //do what you need here
 
     $("#og-reconnect-btn").click(function(){MC.reconnect();});
