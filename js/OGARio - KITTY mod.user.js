@@ -6,7 +6,7 @@
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
-// @updateURL    http://ogario.ovh/download/v2/ogario.v2.user.js
+// @updateURL    https://raw.githubusercontent.com/KindKitty/OGARio-KITTY-mod/master/js/OGARio%20-%20KITTY%20mod.user.js
 // @run-at       document-start
 // @grant        GM_xmlhttpRequest
 // @connect      agar.io
