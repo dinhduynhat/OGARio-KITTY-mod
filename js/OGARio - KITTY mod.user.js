@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.5
+// @version      2.0.6
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -27,11 +27,10 @@ var cpickerCSS = '<link href="http://ogario.ovh/download/v2/dep/bootstrap-colorp
 var toastrJS = '<script src="http://ogario.ovh/download/v2/dep/toastr.min.js" charset="utf-8"></script>';
 var toastrCSS = '<link href="http://ogario.ovh/download/v2/dep/toastr.min.css" rel="stylesheet"></link>';
 
-var skypeJS = '<script src="https://swx.cdn.skype.com/shared/v/1.2.15/SkypeBootstrap.min.js" charset="utf-8"></script>';
 //var customCSS = '<link href="http://localhost/ogario/lol.css" rel="stylesheet"></link>';
 
 function inject(page) {
-    var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS + skypeJS + "</head>");
+    var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS + "</head>");
     //var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + customCSS + cpickerJS + toastrJS + ogarioSniffJS + "</head>");
     _page = _page.replace(/<script.*?>[\s]*?.*?window\.NREUM[\s\S]*?<\/script>/, "");
     _page = _page.replace(/<script.*?src=".*?agario\.core\.js.*?><\/script>/, "");
