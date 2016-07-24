@@ -8,7 +8,7 @@ KITTY mod is OGARio with more awesome features:
 * more features soon...
 
 ### Installation 
-1. Install Tampermonkey browser extension  
+1. Install Tampermonkey browser extension ([Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) | [Opera](https://addons.opera.com/en/extensions/details/tampermonkey-beta/))
 2. Install script [here](https://raw.githubusercontent.com/KindKitty/OGARio-KITTY-mod/master/js/OGARio%20-%20KITTY%20mod.user.js)  
 3. Enjoy! :)
 
