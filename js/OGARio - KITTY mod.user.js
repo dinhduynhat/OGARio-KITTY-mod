@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.3
+// @version      2.0.4
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -57,7 +57,7 @@ var modVersion = GM_info.script.version;
 
 setTimeout(function(){ //do what you need here
 
-    $("#og-reconnect-btn").click(function(){MC.reconnect();});
+    $("#og-reconnect-btn").click(function(){changeServer();});
 
     var aTags = document.getElementsByTagName("button");
     var searchText = "Spectate";
@@ -142,12 +142,25 @@ setTimeout(function(){ //do what you need here
 
     $("#time-hud").attr("style", "top: 290px !important;");
 
+    // fix time
 
+    if($("#showTime").is(':checked')) {
+    	$("#time-hud").show();
+    } else {
+      	$("#time-hud").hide();
+	}
+	
+	
+	
 }, 5000);
 
 
 var searching;
 var timerId;
+
+function changeServer() {
+    MC.reconnect();
+}
 
 function searchPlayer() {
 
@@ -193,7 +206,7 @@ function searchPlayer() {
                 hideCancelSearch();
                 toastr["info"]("Player \'" + searchString + "\' found!");
             } else {
-                MC.reconnect();
+                changeServer();
 
                 // start timer
 
@@ -223,7 +236,7 @@ function searchPlayer() {
                         hideCancelSearch();
                         toastr["info"]("Player \'" + searchString + "\' found!");
                     } else {
-                        MC.reconnect();
+                        changeServer();
                     }
 
                 }, interval);
