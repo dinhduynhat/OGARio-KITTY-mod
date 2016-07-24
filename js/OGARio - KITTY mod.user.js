@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.4
+// @version      2.0.5
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -139,6 +139,20 @@ setTimeout(function(){ //do what you need here
     $("#version").before('<div id="modVersion" class="main-color" style="float:left;margin-top:10px;font-weight: 700;">KITTY mod v' + modVersion + '</div>');
 
     $("#minimap-sectors").attr("style", "opacity: 0.25;");
+
+	// fast table switch + spectate
+	
+	$(document).keypress(function( event ) {
+        if (event.which == 39) {
+            changeServer();
+            $(".btn-spectate").click();
+            var delay = 1000;
+            setTimeout(function() {
+                $(".btn-spectate").click();
+            }, delay);
+        }
+    });
+
 
     $("#time-hud").attr("style", "top: 290px !important;");
 
