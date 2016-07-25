@@ -2,6 +2,7 @@
 
 ### Features 
 KITTY mod is OGARio with more awesome features: 
+* all OGARio features
 * search by player name or clan
 * search full leaderboard (just copy-paste your friends leaderboard to join them)
 * copy leaderboard button
