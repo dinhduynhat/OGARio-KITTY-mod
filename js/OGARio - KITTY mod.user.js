@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.6
+// @version      2.0.7
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -56,8 +56,6 @@ var modVersion = GM_info.script.version;
 
 setTimeout(function(){ //do what you need here
 
-    $("#og-reconnect-btn").click(function(){changeServer();});
-
     var aTags = document.getElementsByTagName("button");
     var searchText = "Spectate";
     var found;
@@ -109,6 +107,9 @@ setTimeout(function(){ //do what you need here
     $("#og-reconnect-btn").prop('title', "Change server");
     $("#og-reconnect-btn").attr('data-toggle', "tooltip");
 
+    $("#og-reconnect-btn").remove();
+
+    $("#join-party-btn").attr("style", "width: 49% !important; float: right;");
     $( "#ogario-party" ).before('<div id="ogario-party">'+
                                 '<input id="searchInput" class="form-control" data-placement="bottom" data-toggle="tooltip" title="You can also paste full leaderboard list here!" placeholder="Find player(s) or clan tag">'+
                                 '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" style="margin-bottom:10px;" data-original-title="" title="Search leaderboards">'+
@@ -123,32 +124,51 @@ setTimeout(function(){ //do what you need here
     });
 
     $("#searchInput").attr('style', 'margin-bottom: 10px; float: left; width: 65% !important');
-    $('[data-toggle="tooltip"]').tooltip();
+
 
     $("#overlays").removeAttr('style');
     $("#overlays").attr('style', 'position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 100;');
 
-    $("#leaderboard-hud").append('<div style="text-align:center;z-index: 110;"><a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info">Copy</a><input id="tempCopy" style="display:none;" value=""></div>');
+    $("#leaderboard-hud").append('<a id="searchBtn2" class="btn btn-sm disabled" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard"style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
+                                 '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
+                                 '<a id="og-reconnect-btn" class="btn btn-info btn-sm icon-loop2" title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Change server" style="'+
+                                 'width: 33.3%;'+
+                                 'text-shadow: 0.3px 0.3px #000000;'+
+                                 'font-size: small;'+
+                                 'margin-top: 0px;'+
+                                 'margin-top: 0px;'+
+                                 'border: none;'+
+                                 '"></a><input id="tempCopy" style="display: none;" value="">');
+
+    $('[data-toggle="tooltip"]').tooltip();
+
     $("#copyLeaderboardBtn").click(function() {
         copyLeaderboard();
     });
 
-    $("#copyLeaderboardBtn").attr("style",'width: 50%;text-shadow: 0.3px 0.3px #000000; font-size: small; margin-top: 0px;border-top-color: '+$(".main-color").css("color")+';border-bottom-style: none; border-left-style: none;border-right-style: none; margin-top: 5px;');
+    $("#og-reconnect-btn").click(function(){
+
+        changeServer();
+        if (ogario.spectate == true) {
+            spectate();
+            spectateWithDelay();
+            spectate();
+        }
+    });
+
+    //$("#copyLeaderboardBtn").attr("style",'width: 50%;text-shadow: 0.3px 0.3px #000000; font-size: small; margin-top: 0px;border-top-color: '+$(".main-color").css("color")+';border-bottom-style: none; border-left-style: none;border-right-style: none; margin-top: 5px;');
 
     $("#version").before('<div id="modVersion" class="main-color" style="float:left;margin-top:10px;font-weight: 700;">KITTY mod v' + modVersion + '</div>');
 
     $("#minimap-sectors").attr("style", "opacity: 0.25;");
 
-	// fast table switch + spectate
-	
-	$(document).keypress(function( event ) {
+    // fast table switch + spectate
+
+    $(document).keypress(function( event ) {
         if (event.which == 39) {
             changeServer();
-            $(".btn-spectate").click();
-            var delay = 1000;
-            setTimeout(function() {
-                $(".btn-spectate").click();
-            }, delay);
+            spectate();
+            spectateWithDelay();
         }
     });
 
@@ -158,18 +178,29 @@ setTimeout(function(){ //do what you need here
     // fix time
 
     if($("#showTime").is(':checked')) {
-    	$("#time-hud").show();
+        $("#time-hud").show();
     } else {
-      	$("#time-hud").hide();
-	}
-	
-	
-	
+        $("#time-hud").hide();
+    }
+
+
+
 }, 5000);
 
 
 var searching;
 var timerId;
+
+function spectate() {
+    $(".btn-spectate").click();
+}
+
+function spectateWithDelay() {
+    var delay = 1000;
+    setTimeout(function() {
+        spectate();
+    }, delay);
+}
 
 function changeServer() {
     MC.reconnect();
@@ -311,3 +342,4 @@ function hideCancelSearch() {
     $("#searchSpan").removeClass("glyphicon-ban-circle").addClass("glyphicon-search");
     $("#searchBtn").removeClass("btn-danger").addClass("btn-primary");
 }
+
