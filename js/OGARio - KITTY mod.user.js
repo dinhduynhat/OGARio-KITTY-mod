@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.7
+// @version      2.0.8
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -110,26 +110,47 @@ setTimeout(function(){ //do what you need here
     $("#og-reconnect-btn").remove();
 
     $("#join-party-btn").attr("style", "width: 49% !important; float: right;");
-    $( "#ogario-party" ).before('<div id="ogario-party">'+
+    /*$( "#ogario-party" ).before('<div id="ogario-party">'+
                                 '<input id="searchInput" class="form-control" data-placement="bottom" data-toggle="tooltip" title="You can also paste full leaderboard list here!" placeholder="Find player(s) or clan tag">'+
                                 '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" style="margin-bottom:10px;" data-original-title="" title="Search leaderboards">'+
                                 '<span id="searchSpan" class="glyphicon glyphicon-search"></span>'+
-                                '</button></div>');
+                                '</button></div>');*/
     //<button id="pasteBtn" class="btn btn-copy-token copy-party-token btn-link" style="margin-bottom: 10px;width:55px;float:left;" data-original-title="" title="Paste"><span class="glyphicon glyphicon-magnet"></span></button>
-    $("#searchBtn").click(function(){searchPlayer();});
-    $("#searchInput").keyup(function(event){
-        if(event.keyCode == 13){
-            $("#searchBtn").click();
-        }
-    });
+
+
+    //backgroud div
+    $("body").prepend('<div id="backgroundFade" style="' +
+                      'width: 100%;' +
+                      'height: 100%;' +
+                      'position: absolute;' +
+                      'background: black;' +
+                      'z-index: 100;' +
+                      'opacity: 0.6;' +
+                      'display: none;' +
+                      '"></div>');
 
     $("#searchInput").attr('style', 'margin-bottom: 10px; float: left; width: 65% !important');
-
 
     $("#overlays").removeAttr('style');
     $("#overlays").attr('style', 'position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 100;');
 
-    $("#leaderboard-hud").append('<a id="searchBtn2" class="btn btn-sm disabled" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard"style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
+    $("#overlays-hud").prepend('<div id="searchHud" class="hud" style="' +
+                               'width: 65%;' +
+                               'height: 60px;' +
+                               'z-index: 15;' +
+                               '#display: block;' +
+                               'margin: auto;' +
+                               'top: 0;' +
+                               'right: 0;' +
+                               'left: 0;' +
+                               'bottom: 0;' +
+                               'position: fixed;">' +
+                               '<div id="" style="margin-top: 10px;">' +
+                               '<input id="searchInput" class="form-control" title="" placeholder="Enter friend\'s leaderboard, name or clan tag..." style="margin-bottom: 10px;float: left;width: 74% !important;text-align: center;">' +
+                               '<button id="closeBtn" class="btn btn-copy-token copy-party-token" data-toggle="tooltip" style="color: #ffffff;margin-bottom:10px;width: 10%;" data-placement="right" data-original-title="Close" title=""><span class="glyphicon glyphicon-remove-circle"></span></button>' +
+                               '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" data-placement="bottom" data-original-title="Cancel search" style="margin-bottom:10px;width: 15%;"><span id="searchSpan" class="glyphicon glyphicon-search"></span></button></div></div>');
+
+    $("#leaderboard-hud").append('<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard"style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
                                  '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
                                  '<a id="og-reconnect-btn" class="btn btn-info btn-sm icon-loop2" title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Change server" style="'+
                                  'width: 33.3%;'+
@@ -141,6 +162,7 @@ setTimeout(function(){ //do what you need here
                                  '"></a><input id="tempCopy" style="display: none;" value="">');
 
     $('[data-toggle="tooltip"]').tooltip();
+    $("#searchBtn").tooltip('disable');
 
     $("#copyLeaderboardBtn").click(function() {
         copyLeaderboard();
@@ -151,10 +173,35 @@ setTimeout(function(){ //do what you need here
         changeServer();
         if (ogario.spectate == true) {
             spectate();
-            spectateWithDelay();
-            spectate();
+            //spectateWithDelay();
+            //spectate();
         }
     });
+
+    $("#searchBtn").click(function(){
+        searchPlayer();
+    });
+    $("#searchInput").keyup(function(event){
+        if(event.keyCode == 13){
+            $("#searchBtn").click();
+        }
+    });
+
+    $("#closeBtn").click(function() {
+        hideSearchHud();
+    });
+    $("#searchShortcut").click(function() {
+        showSearchHud();
+        var lstfocus=$("#searchInput");
+        $("body").click(function(){
+            if ($(':focus').is("input")    ){
+                lstfocus= $(':focus');
+            }
+            lstfocus.focus();
+        });
+        $("#searchInput").focus().select();
+    });
+
 
     //$("#copyLeaderboardBtn").attr("style",'width: 50%;text-shadow: 0.3px 0.3px #000000; font-size: small; margin-top: 0px;border-top-color: '+$(".main-color").css("color")+';border-bottom-style: none; border-left-style: none;border-right-style: none; margin-top: 5px;');
 
@@ -168,8 +215,21 @@ setTimeout(function(){ //do what you need here
         if (event.which == 39) {
             changeServer();
             spectate();
-            spectateWithDelay();
+            //spectateWithDelay();
         }
+    });
+
+    $(document).keydown(function( event ) {
+
+        if (event.which == 27) {
+            if ($('#searchHud').is(':visible')) {
+                hideSearchHud();
+            }
+            if (ogario.spectate == true) {
+                showMenu();
+            }
+        } 
+
     });
 
 
@@ -193,6 +253,7 @@ var timerId;
 
 function spectate() {
     $(".btn-spectate").click();
+    hideMenu();
 }
 
 function spectateWithDelay() {
@@ -216,7 +277,7 @@ function searchPlayer() {
         if($.trim($("#searchInput").val()) == ''){
 
         } else {
-
+            console.log("MC.isConnecting(): " + MC.isConnecting());
             showCancelSearch();
 
             searching = true;
@@ -248,8 +309,11 @@ function searchPlayer() {
             if (found) {
                 searching = false;
                 hideCancelSearch();
-                toastr["info"]("Player \'" + searchString + "\' found!");
+                hideSearchHud();
+                toastr["info"]("Leaderboard found!");
+                showMenu();
             } else {
+                MC.isConnecting();
                 changeServer();
 
                 // start timer
@@ -272,14 +336,17 @@ function searchPlayer() {
                         clearInterval(timerId);
                         searching = false;
                         hideCancelSearch();
-                        toastr["error"]("Player \'" + searchString + "\' not found. Search again!");
+                        toastr["error"]("The leaderboard was not found. Keep trying...");
                     }
                     if (found) {
                         clearInterval(timerId);
                         searching = false;
                         hideCancelSearch();
-                        toastr["info"]("Player \'" + searchString + "\' found!");
+                        hideSearchHud();
+                        toastr["info"]("Leaderboard found!");
+                        showMenu();
                     } else {
+                        console.log("MC.isConnecting(): " + MC.isConnecting());
                         changeServer();
                     }
 
@@ -333,13 +400,41 @@ function copyLeaderboard() {
     $("#tempCopy").val("");
 }
 
+function showSearchHud() {
+
+    $("#backgroundFade").fadeIn();
+    hideMenu();
+    $("#searchHud").fadeIn();
+}
+
+function hideSearchHud(){
+    showMenu();
+    $("#searchHud").fadeOut();
+    $("#backgroundFade").fadeOut();
+}
+
 function showCancelSearch() {
     $("#searchSpan").removeClass("glyphicon-search").addClass("glyphicon-ban-circle");
     $("#searchBtn").removeClass("btn-primary").addClass("btn-danger");
+    $("#searchBtn").tooltip('enable');
+    $("#searchBtn").tooltip('show');
 }
 
 function hideCancelSearch() {
     $("#searchSpan").removeClass("glyphicon-ban-circle").addClass("glyphicon-search");
     $("#searchBtn").removeClass("btn-danger").addClass("btn-primary");
+    $("#searchBtn").tooltip('hide');
+    $("#searchBtn").tooltip('disable');
 }
+
+function showMenu() {
+    $("#overlays").css("left", "0");
+    $("#overlays").show();
+    $("#main-panel").show();
+}
+
+function hideMenu() {
+    $("#overlays").css("left", "-999em");
+}
+
 
