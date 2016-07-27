@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.8
+// @version      2.0.9
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -243,8 +243,9 @@ setTimeout(function(){ //do what you need here
         $("#time-hud").hide();
     }
 
-
-
+// ANNOUNCEMENTS
+    toastr["info"]('KITTY mod v'+modVersion+': Search is now 2x faster! New improved layout! Have fun :D');
+    toastr["info"]('My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
 }, 5000);
 
 
@@ -272,17 +273,17 @@ function searchPlayer() {
     if (!searching) {
 
 
-
         var searchString = $("#searchInput").val().trim();
         if($.trim($("#searchInput").val()) == ''){
 
         } else {
-            console.log("MC.isConnecting(): " + MC.isConnecting());
+            //console.log("MC.isConnecting(): " + MC.isConnecting());
             showCancelSearch();
 
             searching = true;
 
-            var interval = 2500;
+            //var interval = 2500;
+            var interval = 1600;
             var maxTries = 15;
             var numTries = 0;
             var minNamesFound = 2;
@@ -291,7 +292,7 @@ function searchPlayer() {
 
             var leaderboard = $(ogario.leaderboardHTML).text();
             var names = searchString.split(/[1-9]\.\s|10\.\s/g).filter(function(el) {return el.length != 0;});
-            console.log(names);
+            console.log(leaderboard);
 
             var numNames = names.length;
             console.log("Number of names: " + numNames);
@@ -313,43 +314,44 @@ function searchPlayer() {
                 toastr["info"]("Leaderboard found!");
                 showMenu();
             } else {
-                MC.isConnecting();
                 changeServer();
 
                 // start timer
 
                 timerId = setInterval(function(){
 
-                    leaderboard = $(ogario.leaderboardHTML).text();
-
-                    console.log(names);
-                    console.log("Number of names: " + numNames);
-
-                    if (numNames == 1) {
-                        found = foundName(leaderboard, searchString);
-                    } else if (numNames > 1) {
-                        found =  foundNames(leaderboard, names, minNamesFound);
-                    }
-                    numTries++;
-                    toastr["success"]("Search: " + numTries + "\/" + maxTries);
-                    if (numTries >= maxTries) {
-                        clearInterval(timerId);
-                        searching = false;
-                        hideCancelSearch();
-                        toastr["error"]("The leaderboard was not found. Keep trying...");
-                    }
-                    if (found) {
-                        clearInterval(timerId);
-                        searching = false;
-                        hideCancelSearch();
-                        hideSearchHud();
-                        toastr["info"]("Leaderboard found!");
-                        showMenu();
-                    } else {
+                    if (MC.isConnecting() == false) {
                         console.log("MC.isConnecting(): " + MC.isConnecting());
-                        changeServer();
-                    }
+                        leaderboard = $(ogario.leaderboardHTML).text();
 
+                        console.log(leaderboard);
+                        console.log("Number of names: " + numNames);
+
+                        if (numNames == 1) {
+                            found = foundName(leaderboard, searchString);
+                        } else if (numNames > 1) {
+                            found =  foundNames(leaderboard, names, minNamesFound);
+                        }
+                        numTries++;
+                        toastr["success"]("Search: " + numTries + "\/" + maxTries);
+                        if (numTries >= maxTries) {
+                            clearInterval(timerId);
+                            searching = false;
+                            hideCancelSearch();
+                            toastr["error"]("The leaderboard was not found. Keep trying...");
+                        }
+                        if (found) {
+                            clearInterval(timerId);
+                            searching = false;
+                            hideCancelSearch();
+                            hideSearchHud();
+                            toastr["info"]("Leaderboard found!");
+                            showMenu();
+                        } else {
+                            //console.log("MC.isConnecting(): " + MC.isConnecting());
+                            changeServer();
+                        }
+                    }
                 }, interval);
             }
 
