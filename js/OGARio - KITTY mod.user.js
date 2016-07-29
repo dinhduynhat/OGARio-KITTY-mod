@@ -230,7 +230,7 @@ setTimeout(function(){ //do what you need here
     }
 
     // ANNOUNCEMENTS
-    toastr["info"]('KITTY mod v'+modVersion+': Search is now 2x faster! New improved layout! Have fun :D');
+    toastr["info"]('KITTY mod v'+modVersion+': Search and other features were enhanced! Have fun :D');
     toastr["info"]('My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
 
 
