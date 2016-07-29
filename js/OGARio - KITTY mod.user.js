@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.9
+// @version      2.0.10
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -26,12 +26,10 @@ var cpickerJS = '<script src="http://ogario.ovh/download/v2/dep/bootstrap-colorp
 var cpickerCSS = '<link href="http://ogario.ovh/download/v2/dep/bootstrap-colorpicker.min.css" rel="stylesheet"></link>';
 var toastrJS = '<script src="http://ogario.ovh/download/v2/dep/toastr.min.js" charset="utf-8"></script>';
 var toastrCSS = '<link href="http://ogario.ovh/download/v2/dep/toastr.min.css" rel="stylesheet"></link>';
-
-//var customCSS = '<link href="http://localhost/ogario/lol.css" rel="stylesheet"></link>';
+var lock = false;
 
 function inject(page) {
     var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS + "</head>");
-    //var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + customCSS + cpickerJS + toastrJS + ogarioSniffJS + "</head>");
     _page = _page.replace(/<script.*?>[\s]*?.*?window\.NREUM[\s\S]*?<\/script>/, "");
     _page = _page.replace(/<script.*?src=".*?agario\.core\.js.*?><\/script>/, "");
     _page = _page.replace("</body>", ogarioJS + "</body>");
@@ -101,22 +99,11 @@ setTimeout(function(){ //do what you need here
     $("#create-party-btn").attr('data-toggle', "tooltip");
 
     $("#join-party-btn").html('<span class="glyphicon glyphicon-save"></span>');
-    $("#join-party-btn").prop('title', "Join party");
-    $("#join-party-btn").attr('data-toggle', "tooltip");
-
-    $("#og-reconnect-btn").prop('title', "Change server");
-    $("#og-reconnect-btn").attr('data-toggle', "tooltip");
+    $("#join-party-btn").attr('data-toggle', "tooltip").prop('title', "Join party");
 
     $("#og-reconnect-btn").remove();
 
     $("#join-party-btn").attr("style", "width: 49% !important; float: right;");
-    /*$( "#ogario-party" ).before('<div id="ogario-party">'+
-                                '<input id="searchInput" class="form-control" data-placement="bottom" data-toggle="tooltip" title="You can also paste full leaderboard list here!" placeholder="Find player(s) or clan tag">'+
-                                '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" style="margin-bottom:10px;" data-original-title="" title="Search leaderboards">'+
-                                '<span id="searchSpan" class="glyphicon glyphicon-search"></span>'+
-                                '</button></div>');*/
-    //<button id="pasteBtn" class="btn btn-copy-token copy-party-token btn-link" style="margin-bottom: 10px;width:55px;float:left;" data-original-title="" title="Paste"><span class="glyphicon glyphicon-magnet"></span></button>
-
 
     //backgroud div
     $("body").prepend('<div id="backgroundFade" style="' +
@@ -129,10 +116,7 @@ setTimeout(function(){ //do what you need here
                       'display: none;' +
                       '"></div>');
 
-    $("#searchInput").attr('style', 'margin-bottom: 10px; float: left; width: 65% !important');
-
-    $("#overlays").removeAttr('style');
-    $("#overlays").attr('style', 'position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 100;');
+    $("#overlays").css("z-index",100);
 
     $("#overlays-hud").prepend('<div id="searchHud" class="hud" style="' +
                                'width: 65%;' +
@@ -150,9 +134,9 @@ setTimeout(function(){ //do what you need here
                                '<button id="closeBtn" class="btn btn-copy-token copy-party-token" data-toggle="tooltip" style="color: #ffffff;margin-bottom:10px;width: 10%;" data-placement="right" data-original-title="Close" title=""><span class="glyphicon glyphicon-remove-circle"></span></button>' +
                                '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" data-placement="bottom" data-original-title="Cancel search" style="margin-bottom:10px;width: 15%;"><span id="searchSpan" class="glyphicon glyphicon-search"></span></button></div></div>');
 
-    $("#leaderboard-hud").append('<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard"style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
+    $("#leaderboard-hud").append('<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)"style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
                                  '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
-                                 '<a id="og-reconnect-btn" class="btn btn-info btn-sm icon-loop2" title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Change server" style="'+
+                                 '<a id="og-reconnect-btn" class="btn btn-info btn-sm icon-loop2" title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Change server (+)" style="'+
                                  'width: 33.3%;'+
                                  'text-shadow: 0.3px 0.3px #000000;'+
                                  'font-size: small;'+
@@ -172,14 +156,14 @@ setTimeout(function(){ //do what you need here
 
         changeServer();
         if (ogario.spectate == true) {
-            spectate();
-            //spectateWithDelay();
-            //spectate();
+            hideSearchHud();
+            delay(700, spectate);
         }
     });
 
     $("#searchBtn").click(function(){
-        searchPlayer();
+        var searchString = $("#searchInput").val().trim();
+        searchPlayer(searchString);
     });
     $("#searchInput").keyup(function(event){
         if(event.keyCode == 13){
@@ -191,6 +175,7 @@ setTimeout(function(){ //do what you need here
         hideSearchHud();
     });
     $("#searchShortcut").click(function() {
+        hideMenu();
         showSearchHud();
         var lstfocus=$("#searchInput");
         $("body").click(function(){
@@ -202,34 +187,35 @@ setTimeout(function(){ //do what you need here
         $("#searchInput").focus().select();
     });
 
-
-    //$("#copyLeaderboardBtn").attr("style",'width: 50%;text-shadow: 0.3px 0.3px #000000; font-size: small; margin-top: 0px;border-top-color: '+$(".main-color").css("color")+';border-bottom-style: none; border-left-style: none;border-right-style: none; margin-top: 5px;');
-
-    $("#version").before('<div id="modVersion" class="main-color" style="float:left;margin-top:10px;font-weight: 700;">KITTY mod v' + modVersion + '</div>');
+    $("#version").before('<div id="modVersion" class="main-color" style="float:left;margin-top:10px;font-weight: 700;"><a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">KITTY mod</a> v' + modVersion + '</div>');
 
     $("#minimap-sectors").attr("style", "opacity: 0.25;");
 
     // fast table switch + spectate
 
-    $(document).keypress(function( event ) {
-        if (event.which == 39) {
+
+    $(document).keyup(function( event ) {
+        if (event.which == 8) {
+            if ($('input:focus').length == 0) {
+                $("#searchShortcut").click();
+            }
+
+        } else if(event.which == 187) {
+            hideSearchHud();
             changeServer();
-            spectate();
-            //spectateWithDelay();
+            delay(700, spectate);
         }
     });
 
-    $(document).keydown(function( event ) {
+    $(document).keyup(function( event ) {
 
         if (event.which == 27) {
             if ($('#searchHud').is(':visible')) {
                 hideSearchHud();
-            }
-            if (ogario.spectate == true) {
+            } else {
                 showMenu();
             }
-        } 
-
+        }
     });
 
 
@@ -243,37 +229,34 @@ setTimeout(function(){ //do what you need here
         $("#time-hud").hide();
     }
 
-// ANNOUNCEMENTS
+    // ANNOUNCEMENTS
     toastr["info"]('KITTY mod v'+modVersion+': Search is now 2x faster! New improved layout! Have fun :D');
     toastr["info"]('My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
+
+
+
 }, 5000);
 
 
 var searching;
 var timerId;
 
-function spectate() {
-    $(".btn-spectate").click();
-    hideMenu();
+function delay(time, func) {
+    setTimeout(function(){ func(); }, time);
 }
 
-function spectateWithDelay() {
-    var delay = 1000;
-    setTimeout(function() {
-        spectate();
-    }, delay);
+function spectate() {
+    hideMenu();
+    $(".btn-spectate").click();
 }
 
 function changeServer() {
     MC.reconnect();
 }
 
-function searchPlayer() {
-
+function searchPlayer(searchString) {
     if (!searching) {
 
-
-        var searchString = $("#searchInput").val().trim();
         if($.trim($("#searchInput").val()) == ''){
 
         } else {
@@ -284,9 +267,9 @@ function searchPlayer() {
 
             //var interval = 2500;
             var interval = 1600;
-            var maxTries = 15;
+            var maxTries = 40;
             var numTries = 0;
-            var minNamesFound = 2;
+            var minNamesFound = 3;
 
             toastr["success"]("Searching \'" + searchString + "\'...");
 
@@ -359,13 +342,13 @@ function searchPlayer() {
         }
 
     } else {
-        var r = confirm("Stop searching?");
-        if (r == true) {
-            clearInterval(timerId);
-            searching = false;
-            hideCancelSearch();
-            toastr["error"]("Search was canceled by user!");
-        }
+        //var r = confirm("Stop searching?");
+        //if (r == true) {
+        clearInterval(timerId);
+        searching = false;
+        hideCancelSearch();
+        toastr["error"]("Search was canceled by user!");
+        //}
     }
 }
 
@@ -403,14 +386,11 @@ function copyLeaderboard() {
 }
 
 function showSearchHud() {
-
     $("#backgroundFade").fadeIn();
-    hideMenu();
     $("#searchHud").fadeIn();
 }
 
 function hideSearchHud(){
-    showMenu();
     $("#searchHud").fadeOut();
     $("#backgroundFade").fadeOut();
 }
@@ -432,11 +412,13 @@ function hideCancelSearch() {
 function showMenu() {
     $("#overlays").css("left", "0");
     $("#overlays").show();
-    $("#main-panel").show();
+
+    $('a[href="#main-panel"]').click();
 }
 
 function hideMenu() {
     $("#overlays").css("left", "-999em");
 }
+
 
 
