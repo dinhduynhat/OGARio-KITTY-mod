@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.10
+// @version      2.0.11
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -26,7 +26,8 @@ var cpickerJS = '<script src="http://ogario.ovh/download/v2/dep/bootstrap-colorp
 var cpickerCSS = '<link href="http://ogario.ovh/download/v2/dep/bootstrap-colorpicker.min.css" rel="stylesheet"></link>';
 var toastrJS = '<script src="http://ogario.ovh/download/v2/dep/toastr.min.js" charset="utf-8"></script>';
 var toastrCSS = '<link href="http://ogario.ovh/download/v2/dep/toastr.min.css" rel="stylesheet"></link>';
-var lock = false;
+
+//var screenshotJS = '<script src="https://github.com/niklasvh/html2canvas/releases/download/0.4.1/html2canvas.js" charset="utf-8"></script>';
 
 function inject(page) {
     var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS + "</head>");
@@ -49,10 +50,13 @@ GM_xmlhttpRequest({
     }
 });
 
-// KITTY mod
+/**********
+* KITTY mod
+**********/
+
 var modVersion = GM_info.script.version;
 
-setTimeout(function(){ //do what you need here
+setTimeout(function(){
 
     var aTags = document.getElementsByTagName("button");
     var searchText = "Spectate";
@@ -134,16 +138,18 @@ setTimeout(function(){ //do what you need here
                                '<button id="closeBtn" class="btn btn-copy-token copy-party-token" data-toggle="tooltip" style="color: #ffffff;margin-bottom:10px;width: 10%;" data-placement="right" data-original-title="Close" title=""><span class="glyphicon glyphicon-remove-circle"></span></button>' +
                                '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" data-placement="bottom" data-original-title="Cancel search" style="margin-bottom:10px;width: 15%;"><span id="searchSpan" class="glyphicon glyphicon-search"></span></button></div></div>');
 
-    $("#leaderboard-hud").append('<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)"style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
+    $("#leaderboard-hud").append('<div id="leaderboard-menu">'+
+                                 '<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)"style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
                                  '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
                                  '<a id="og-reconnect-btn" class="btn btn-info btn-sm icon-loop2" title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Change server (+)" style="'+
                                  'width: 33.3%;'+
-                                 'text-shadow: 0.3px 0.3px #000000;'+
-                                 'font-size: small;'+
-                                 'margin-top: 0px;'+
-                                 'margin-top: 0px;'+
-                                 'border: none;'+
-                                 '"></a><input id="tempCopy" style="display: none;" value="">');
+                                 'text-shadow: 0.3px 0.3px #000000;' +
+                                 'font-size: small;' +
+                                 'margin-top: 0px;' +
+                                 'margin-top: 0px;' +
+                                 'border: none;' +
+                                 '"></a><input id="tempCopy" style="display: none;" value="">'+
+                                 '</div>');
 
     $('[data-toggle="tooltip"]').tooltip();
     $("#searchBtn").tooltip('disable');
@@ -157,7 +163,7 @@ setTimeout(function(){ //do what you need here
         changeServer();
         if (ogario.spectate == true) {
             hideSearchHud();
-            delay(700, spectate);
+            spectateWithDelay();
         }
     });
 
@@ -187,9 +193,12 @@ setTimeout(function(){ //do what you need here
         $("#searchInput").focus().select();
     });
 
-    $("#version").before('<div id="modVersion" class="main-color" style="float:left;margin-top:10px;font-weight: 700;"><a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">KITTY mod</a> v' + modVersion + '</div>');
+    $("#version").before('<div id="modVersion" class="main-color" style="float:left;font-weight: 700;"><a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod" style="color: #ffffff;">KITTY mod</a> v' + modVersion + '</div>');
 
     $("#minimap-sectors").attr("style", "opacity: 0.25;");
+
+    $(".btn-donate").remove();
+    $("#version").after('<a href="http://bit.ly/2ay9T4Z" class="btn-donate" target="_blank" style="float: right;">DONATE by click [AD]</a>');
 
     // fast table switch + spectate
 
@@ -203,7 +212,7 @@ setTimeout(function(){ //do what you need here
         } else if(event.which == 187) {
             hideSearchHud();
             changeServer();
-            delay(700, spectate);
+            spectateWithDelay();
         }
     });
 
@@ -229,8 +238,12 @@ setTimeout(function(){ //do what you need here
         $("#time-hud").hide();
     }
 
+    // leaderboard buttons  fix
+    $("#leaderboard-menu").css("pointer-events", "auto");
+    $("#searchHud").css("pointer-events", "auto");
+
     // ANNOUNCEMENTS
-    toastr["info"]('KITTY mod v'+modVersion+': Search and other features were enhanced! Have fun :D');
+    toastr["info"]('KITTY mod v'+modVersion+': Fixed search stopping and leaderboard buttons! Have fun :D');
     toastr["info"]('My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
 
 
@@ -250,6 +263,10 @@ function spectate() {
     $(".btn-spectate").click();
 }
 
+function spectateWithDelay() {
+    delay(800, spectate);
+}
+
 function changeServer() {
     MC.reconnect();
 }
@@ -266,10 +283,13 @@ function searchPlayer(searchString) {
             searching = true;
 
             //var interval = 2500;
-            var interval = 1600;
-            var maxTries = 40;
+            var interval = 1800;
+            var maxTries = 30;
             var numTries = 0;
             var minNamesFound = 3;
+
+            var numAttempts = 0;
+            var maxAttempts = 2;
 
             toastr["success"]("Searching \'" + searchString + "\'...");
 
@@ -303,7 +323,8 @@ function searchPlayer(searchString) {
 
                 timerId = setInterval(function(){
 
-                    if (MC.isConnecting() == false) {
+                    if (MC.isConnecting() == false || numAttempts == maxAttempts) {
+                        numAttempts = 0;
                         console.log("MC.isConnecting(): " + MC.isConnecting());
                         leaderboard = $(ogario.leaderboardHTML).text();
 
@@ -334,6 +355,9 @@ function searchPlayer(searchString) {
                             //console.log("MC.isConnecting(): " + MC.isConnecting());
                             changeServer();
                         }
+                    } else {
+                        numAttempts++;
+                        console.log("numAttempts: " + numAttempts);
                     }
                 }, interval);
             }
@@ -369,7 +393,7 @@ function foundNames(leaderboard, names, minNamesFound) {
 
     //if (countFound >= minNamesFound) {alert(countFound);}
 
-    console.log("found: " + countFound);    
+    console.log("found: " + countFound);
     return (countFound >= minNamesFound) ? true : false;
 }
 
@@ -419,6 +443,7 @@ function showMenu() {
 function hideMenu() {
     $("#overlays").css("left", "-999em");
 }
+
 
 
 
