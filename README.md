@@ -15,6 +15,10 @@ KITTY mod is OGARio with more awesome features:
 3. Open agar.io
 3. Enjoy! :)
 
+### Video
+
+[![OGARio - KITTY mod Installation Tutorial (Agario extension)](https://img.youtube.com/vi/Q7cAXZtUZXo/0.jpg)](https://youtu.be/Q7cAXZtUZXo?t=136)
+
 ### Screenshot
 
 ![alt tag](http://i.imgur.com/oJWt7D1.png)
