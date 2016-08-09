@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.0 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.11
+// @version      2.0.12
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -209,7 +209,7 @@ setTimeout(function(){
                 $("#searchShortcut").click();
             }
 
-        } else if(event.which == 187) {
+        } else if(event.which == 187 && !($("input").is(":focus"))) {
             hideSearchHud();
             changeServer();
             spectateWithDelay();
@@ -238,15 +238,40 @@ setTimeout(function(){
         $("#time-hud").hide();
     }
 
-    // leaderboard buttons  fix
+    // fix leaderboard buttons
     $("#leaderboard-menu").css("pointer-events", "auto");
     $("#searchHud").css("pointer-events", "auto");
 
+    // fix stats text size
+    $('[id="statsText"]').css("font-size", "medium");
+
+
+    // detect paste
+    $(document).bind("paste", function(e){
+        if (!searching && !($("input").is(":focus"))) {
+            var pastedData = e.originalEvent.clipboardData.getData('text');
+            hideMenu();
+            showSearchHud();
+            $("#searchInput").val(pastedData);
+            $("#searchInput").select();
+            searchPlayer(pastedData);
+        }
+    } );
+
+    $("#searchInput").bind("paste", function(e){
+        if (!searching) {
+            var pastedData = e.originalEvent.clipboardData.getData('text');
+            $("#searchInput").val(pastedData);
+            $("#searchInput").select();
+            searchPlayer(pastedData);
+        }
+    } );
+
     // ANNOUNCEMENTS
-    toastr["info"]('KITTY mod v'+modVersion+': Fixed search stopping and leaderboard buttons! Have fun :D');
+    toastr["info"]('KITTY mod v'+modVersion+': You can now auto search by pasting anywhere on agar! Have fun :D');
     toastr["info"]('My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
 
-
+    console.log("lala: "+jQuery._data( "#leaderboard-positions", "events" ));
 
 }, 5000);
 
