@@ -191,7 +191,7 @@ setTimeout(function(){
         $("#searchInput").focus().select();
     });
 
-    $("#version").before('<div id="modVersion" class="main-color" style="float:left;font-weight: 700;"><a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod" style="color: #ffffff;">KITTY mod</a> v' + modVersion + '</div>');
+    $("#menu-footer-v").before('<div id="modVersion" class="main-color" style="margin-top: 3px;float:left;font-weight: 700;"><a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod" style="color: #ffffff;">KITTY mod</a> v' + modVersion + '</div>');
 
     $("#minimap-sectors").attr("style", "opacity: 0.25;");
 
