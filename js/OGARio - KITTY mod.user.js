@@ -1,8 +1,8 @@
 
 // ==UserScript==
-// @name         OGARio by szymy 2.0 (KITTY mod v2)
+// @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.12
+// @version      2.0.13
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -19,15 +19,13 @@ if (location.host == "agar.io" && location.pathname == "/") {
     return;
 }
 
-var ogarioJS = '<script src="http://ogario.ovh/download/v2/ogario.v2.js" charset="utf-8"></script>';
-var ogarioSniffJS = '<script src="http://ogario.ovh/download/v2/ogario.v2.sniff.js"></script>';
-var ogarioCSS = '<link href="http://ogario.ovh/download/v2/ogario.v2.css" rel="stylesheet"></link>';
+var ogarioJS = '<script src="http://ogario.ovh/download/v21/ogario.v2.js" charset="utf-8"></script>';
+var ogarioSniffJS = '<script src="http://ogario.ovh/download/v21/ogario.v2.sniff.js"></script>';
+var ogarioCSS = '<link href="http://ogario.ovh/download/v21/ogario.v2.css" rel="stylesheet"></link>';
 var cpickerJS = '<script src="http://ogario.ovh/download/v2/dep/bootstrap-colorpicker.min.js"></script>';
 var cpickerCSS = '<link href="http://ogario.ovh/download/v2/dep/bootstrap-colorpicker.min.css" rel="stylesheet"></link>';
 var toastrJS = '<script src="http://ogario.ovh/download/v2/dep/toastr.min.js" charset="utf-8"></script>';
 var toastrCSS = '<link href="http://ogario.ovh/download/v2/dep/toastr.min.css" rel="stylesheet"></link>';
-
-//var screenshotJS = '<script src="https://github.com/niklasvh/html2canvas/releases/download/0.4.1/html2canvas.js" charset="utf-8"></script>';
 
 function inject(page) {
     var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS + "</head>");
@@ -289,10 +287,11 @@ function spectate() {
 }
 
 function spectateWithDelay() {
-    delay(800, spectate);
+    delay(1000, spectate);
 }
 
 function changeServer() {
+    //MC.refreshRegionInfo();
     MC.reconnect();
 }
 
@@ -391,13 +390,10 @@ function searchPlayer(searchString) {
         }
 
     } else {
-        //var r = confirm("Stop searching?");
-        //if (r == true) {
         clearInterval(timerId);
         searching = false;
         hideCancelSearch();
         toastr["error"]("Search was canceled by user!");
-        //}
     }
 }
 
