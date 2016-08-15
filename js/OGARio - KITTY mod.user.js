@@ -390,7 +390,7 @@ function searchPlayer(searchString) {
             var numAttempts = 0;
             var maxAttempts = 2;
 
-            toastr["success"]("Searching \'" + searchString + "\'...");
+            toastr["success"]("Searching \'" + searchString + "\'...").css("width","210px");
 
             var leaderboard = getLeaderboard();
             var names = searchString.split(/[1-9]\.\s|10\.\s/g).filter(function(el) {return el.length != 0;});
@@ -401,7 +401,7 @@ function searchPlayer(searchString) {
 
             var found = false;
             numTries++;
-            toastr["success"]("Search: " + numTries + "\/" + maxTries);
+            toastr["success"]("Search: " + numTries + "\/" + maxTries).css("width","210px");
 
             if (numNames == 1) {
                 found = foundName(leaderboard, searchString);
@@ -413,7 +413,7 @@ function searchPlayer(searchString) {
                 searching = false;
                 hideCancelSearch();
                 hideSearchHud();
-                toastr["info"]("Leaderboard found!");
+                toastr["info"]("Leaderboard found!").css("width","210px");
                 showMenu();
             } else {
                 changeServer();
@@ -436,19 +436,19 @@ function searchPlayer(searchString) {
                             found =  foundNames(leaderboard, names, minNamesFound);
                         }
                         numTries++;
-                        toastr["success"]("Search: " + numTries + "\/" + maxTries);
+                        toastr["success"]("Search: " + numTries + "\/" + maxTries).css("width","210px");
                         if (numTries >= maxTries) {
                             clearInterval(timerId);
                             searching = false;
                             hideCancelSearch();
-                            toastr["error"]("The leaderboard was not found. Keep trying...");
+                            toastr["error"]("The leaderboard was not found. Keep trying...").css("width","210px");
                         }
                         if (found) {
                             clearInterval(timerId);
                             searching = false;
                             hideCancelSearch();
                             hideSearchHud();
-                            toastr["info"]("Leaderboard found!");
+                            toastr["info"]("Leaderboard found!").css("width","210px");
                             showMenu();
                         } else {
                             //console.log("MC.isConnecting(): " + MC.isConnecting());
@@ -468,7 +468,7 @@ function searchPlayer(searchString) {
         clearInterval(timerId);
         searching = false;
         hideCancelSearch();
-        toastr["error"]("Search was canceled by user!");
+        toastr["error"]("Search was canceled by user!").css("width","210px");
     }
 }
 
