@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.13
+// @version      2.0.14
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -120,7 +120,9 @@ setTimeout(function(){
 
     $("#overlays").css("z-index",100);
 
-    $("#overlays-hud").prepend('<div id="searchHud" class="hud" style="' +
+    $("#overlays-hud").prepend('<div id="statsInfo" class="main-color" style="display: none;font-size: 13px;margin-top: 3px;float: left;font-weight: 700;background-color: rgba(0, 0, 0, 0.2);padding: 3px;border-radius: 4px;width: 65%;height: 24px;z-index: 15;margin: auto;top: 0px;right: 0px;left: 0px;bottom: 85px;position: fixed;pointer-events: auto;color: #ffffff;"><p style="float: left;margin-left: 10px;">Region: <span id="currentRegion"></span></p><p style="float: right;margin-right: 225px;">Servers: <span id="numServers"></span> (<span id="pps"></span> <span data-toggle="tooltip" data-placement="top" data-original-title="Players per server">PPS</span>)</p><p style="margin-left: 245px;">Players: <span id="numPlayers"></span> / <span id="totalPlayers"  data-toggle="tooltip" data-placement="top" data-original-title="Total players online"></span></p></div>'+
+
+                               '<div id="searchHud" class="hud" style="' +
                                'width: 65%;' +
                                'height: 60px;' +
                                'z-index: 15;' +
@@ -137,7 +139,7 @@ setTimeout(function(){
                                '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" data-placement="bottom" data-original-title="Cancel search" style="margin-bottom:10px;width: 15%;"><span id="searchSpan" class="glyphicon glyphicon-search"></span></button></div></div>');
 
     $("#leaderboard-hud").append('<div id="leaderboard-menu">'+
-                                 '<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)"style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
+                                 '<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
                                  '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
                                  '<a id="og-reconnect-btn" class="btn btn-info btn-sm icon-loop2" title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Change server (+)" style="'+
                                  'width: 33.3%;'+
@@ -266,8 +268,8 @@ setTimeout(function(){
     } );
 
     // ANNOUNCEMENTS
-    toastr["info"]('KITTY mod v'+modVersion+': You can now auto search by pasting anywhere on agar! Have fun :D');
-    toastr["info"]('My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
+    toastr["info"]('KITTY mod v'+modVersion+': Now you can see servers and players stats while searching! Have fun :D');
+    toastr["info"]('Don\'t forget to share! </br>My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
 
     console.log("lala: "+jQuery._data( "#leaderboard-positions", "events" ));
 
@@ -430,14 +432,47 @@ function copyLeaderboard() {
     $("#tempCopy").val("");
 }
 
+function getInfo() {
+
+    $.ajax({ type: "GET", url: "http://m.agar.io/info",
+            datatype: 'json',
+            success: function(info){
+
+                $('#currentRegion').html(MC.getRegion());
+
+                var regions = info.regions;
+                console.log(regions);
+
+                // find out current region
+                var currentRegion;
+                for (var key in regions) {
+                    if (key == MC.getRegion()) {
+                        currentRegion = regions[key];
+                        break;
+                    }
+
+                }
+                $('#numPlayers').html(kFormatter(currentRegion.numPlayers));
+                $('#totalPlayers').html(kFormatter(info.totals.numPlayers));
+                $('#numServers').html(currentRegion.numRealms);
+                $('#pps').html(Math.round(currentRegion.avgPlayersPerRealm));
+
+            }
+           });
+
+}
+
 function showSearchHud() {
+    getInfo();
     $("#backgroundFade").fadeIn();
     $("#searchHud").fadeIn();
+    $("#statsInfo").fadeIn();
 }
 
 function hideSearchHud(){
     $("#searchHud").fadeOut();
     $("#backgroundFade").fadeOut();
+    $("#statsInfo").fadeOut();
 }
 
 function showCancelSearch() {
@@ -466,5 +501,8 @@ function hideMenu() {
 }
 
 
+function kFormatter(num) {
+    return num > 999 ? (num/1000).toFixed(1) + 'k' : num;
+}
 
 
