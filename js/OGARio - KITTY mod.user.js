@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.14
+// @version      2.0.15
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -138,6 +138,64 @@ setTimeout(function(){
                                '<button id="closeBtn" class="btn btn-copy-token copy-party-token" data-toggle="tooltip" style="color: #ffffff;margin-bottom:10px;width: 10%;" data-placement="right" data-original-title="Close" title=""><span class="glyphicon glyphicon-remove-circle"></span></button>' +
                                '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" data-placement="bottom" data-original-title="Cancel search" style="margin-bottom:10px;width: 15%;"><span id="searchSpan" class="glyphicon glyphicon-search"></span></button></div></div>');
 
+    $("#statsInfo").before('<div id="notes" class="main-color" style="display:none;font-size: 13px;float: left;font-weight: 700;border-radius: 4px;width: 65%;height: 147px;z-index: 15;margin: auto;top: 0px;right: 0px;left: 0px;bottom: 400px;position: fixed;pointer-events: auto;color: rgb(255, 255, 255);padding: 10px;background-color: rgba(0, 0, 0, 0.2);"><h5 class="main-color text-center" style="margin-top: 0px;">Save for later</h5>'+
+                           '<input id="note1" class="form-control main-color note" style="background: transparent;color: lightgrey;  width: 25%;float:left; border: none; border-bottom: 1px solid; border-color: darkgrey; margin-right: 7px; text-align: center;">'+
+                           '<input id="note2" class="form-control main-color note" style="background: transparent; color: lightgrey; width: 24%; float: left; border: none; border-bottom: 1px solid; margin-left: 0px; margin-right: 7px; text-align: center;'+
+                           ' border-color: darkgrey;">'+
+                           '<input id="note3" class="form-control main-color note" style="'+
+                           'background: transparent;'+
+                           'color: lightgrey;'+
+                           'width: 49%;'+
+                           'border: none;'+
+                           'border-bottom: 1px solid;'+
+                           'margin-left: 10px;'+
+                           'text-align: center;'+
+                           'border-color: darkgrey;'+
+                           '"><input id="note4" class="form-control main-color note" style="'+
+                           'background: transparent;'+
+                           'color: lightgrey;'+
+                           'width: 25%;'+
+                           'float: left;'+
+                           'border: none;'+
+                           'border-bottom: 1px solid;'+
+                           'margin-right: 7px;'+
+                           'text-align: center;'+
+                           'border-color: darkgrey;'+
+                           '"><input id="note5" class="form-control main-color note" style="'+
+                           'background: transparent;'+
+                           'color: lightgrey;'+
+                           'width: 24%;'+
+                           'float: left;'+
+                           'border: none;'+
+                           'border-bottom: 1px solid;'+
+                           'margin-left: 0px;'+
+                           'margin-right: 7px;'+
+                           'text-align: center;'+
+                           'border-color: darkgrey;'+
+                           '"><input id="note6" class="form-control main-color note" style="'+
+                           'background: transparent;'+
+                           'color: lightgrey;'+
+                           'width: 49%;'+
+                           'border: none;'+
+                           'border-bottom: 1px solid;'+
+                           'margin-left: 10px;'+
+                           'text-align: center;'+
+                           'border-color: darkgrey;'+
+                           '"><input id="note7" class="form-control main-color note" style="'+
+                           'background: transparent;'+
+                           'color: lightgrey;'+
+                           'border: none;'+
+                           'border-bottom: 1px solid;'+
+                           'text-align: center;'+
+                           'border-color: darkgrey;'+
+                           '"></div>');
+
+    // notes
+
+    $(".note").keyup(function(event) {
+        localStorage.setItem(event.target.id, $(event.target).val());
+    });
+
     $("#leaderboard-hud").append('<div id="leaderboard-menu">'+
                                  '<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
                                  '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
@@ -185,7 +243,7 @@ setTimeout(function(){
         showSearchHud();
         var lstfocus=$("#searchInput");
         $("body").click(function(){
-            if ($(':focus').is("input")    ){
+            if ($(':focus').is("input")){
                 lstfocus= $(':focus');
             }
             lstfocus.focus();
@@ -267,8 +325,19 @@ setTimeout(function(){
         }
     } );
 
+    //load notes
+    $("#note1").val(localStorage.getItem('note1'));
+    $("#note2").val(localStorage.getItem('note2'));
+    $("#note3").val(localStorage.getItem('note3'));
+    $("#note4").val(localStorage.getItem('note4'));
+    $("#note5").val(localStorage.getItem('note5'));
+    $("#note6").val(localStorage.getItem('note6'));
+    $("#note7").val(localStorage.getItem('note7'));
+
+    getInfo();
+
     // ANNOUNCEMENTS
-    toastr["info"]('KITTY mod v'+modVersion+': Now you can see servers and players stats while searching! Have fun :D');
+    toastr["info"]('KITTY mod v'+modVersion+': Now you can see game stats while searching and save your searches for later! Have fun :D');
     toastr["info"]('Don\'t forget to share! </br>My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
 
     console.log("lala: "+jQuery._data( "#leaderboard-positions", "events" ));
@@ -465,13 +534,16 @@ function getInfo() {
 function showSearchHud() {
     getInfo();
     $("#backgroundFade").fadeIn();
-    $("#searchHud").fadeIn();
+    $("#notes").fadeIn();
     $("#statsInfo").fadeIn();
+    $("#searchHud").fadeIn();
+
 }
 
 function hideSearchHud(){
     $("#searchHud").fadeOut();
     $("#backgroundFade").fadeOut();
+    $("#notes").fadeOut();
     $("#statsInfo").fadeOut();
 }
 
