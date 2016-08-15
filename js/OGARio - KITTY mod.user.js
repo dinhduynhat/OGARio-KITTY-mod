@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.15
+// @version      2.0.16
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -28,7 +28,7 @@ var toastrJS = '<script src="http://ogario.ovh/download/v2/dep/toastr.min.js" ch
 var toastrCSS = '<link href="http://ogario.ovh/download/v2/dep/toastr.min.css" rel="stylesheet"></link>';
 
 function inject(page) {
-    var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS + "</head>");
+    var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS  + "</head>");
     _page = _page.replace(/<script.*?>[\s]*?.*?window\.NREUM[\s\S]*?<\/script>/, "");
     _page = _page.replace(/<script.*?src=".*?agario\.core\.js.*?><\/script>/, "");
     _page = _page.replace("</body>", ogarioJS + "</body>");
@@ -196,6 +196,11 @@ setTimeout(function(){
         localStorage.setItem(event.target.id, $(event.target).val());
     });
 
+    $("#searchHud").after('<div id="searchLog" class="main-color" style="font-size: 13px;float: left;font-weight: 700;border-radius: 4px;width: 65%;height: 270px;z-index: 15;margin: auto;top: 0px;right: 0px;left: 0px;bottom: -390px;position: fixed;pointer-events: auto;color: rgb(255, 255, 255);padding: 10px;display: none;background-color: rgba(0, 0, 0, 0.2);"><h5 class="main-color text-center" style="margin-top: 0px;">Search log</h5>'+
+                          '<div id="log" style="font-weight: normal; overflow-x: hidden; overflow-y: auto;height: 90%;">'+
+
+                          '</div></div>');
+
     $("#leaderboard-hud").append('<div id="leaderboard-menu">'+
                                  '<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
                                  '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
@@ -241,13 +246,13 @@ setTimeout(function(){
     $("#searchShortcut").click(function() {
         hideMenu();
         showSearchHud();
-        var lstfocus=$("#searchInput");
+        /*var lstfocus=$("#searchInput");
         $("body").click(function(){
             if ($(':focus').is("input")){
                 lstfocus= $(':focus');
             }
             lstfocus.focus();
-        });
+        });*/
         $("#searchInput").focus().select();
     });
 
@@ -255,8 +260,8 @@ setTimeout(function(){
 
     $("#minimap-sectors").attr("style", "opacity: 0.25;");
 
-    $(".btn-donate").remove();
-    $("#version").after('<a href="http://bit.ly/2ay9T4Z" class="btn-donate" target="_blank" style="float: right;">DONATE by click [AD]</a>');
+    //$(".btn-donate").remove();
+    //$("#version").after('<a href="http://bit.ly/2ay9T4Z" class="btn-donate" target="_blank" style="float: right;">DONATE by click [AD]</a>');
 
     // fast table switch + spectate
 
@@ -337,10 +342,8 @@ setTimeout(function(){
     getInfo();
 
     // ANNOUNCEMENTS
-    toastr["info"]('KITTY mod v'+modVersion+': Now you can see game stats while searching and save your searches for later! Have fun :D');
+    toastr["info"]('KITTY mod v'+modVersion+': Now you can see game stats while searching, save your searches for later AND see your server history! Have fun :D');
     toastr["info"]('Don\'t forget to share! </br>My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
-
-    console.log("lala: "+jQuery._data( "#leaderboard-positions", "events" ));
 
 }, 5000);
 
@@ -364,6 +367,7 @@ function spectateWithDelay() {
 function changeServer() {
     //MC.refreshRegionInfo();
     MC.reconnect();
+    appendLog(getLeaderboard());
 }
 
 function searchPlayer(searchString) {
@@ -388,7 +392,7 @@ function searchPlayer(searchString) {
 
             toastr["success"]("Searching \'" + searchString + "\'...");
 
-            var leaderboard = $(ogario.leaderboardHTML).text();
+            var leaderboard = getLeaderboard();
             var names = searchString.split(/[1-9]\.\s|10\.\s/g).filter(function(el) {return el.length != 0;});
             console.log(leaderboard);
 
@@ -537,6 +541,7 @@ function showSearchHud() {
     $("#notes").fadeIn();
     $("#statsInfo").fadeIn();
     $("#searchHud").fadeIn();
+    $("#searchLog").fadeIn();
 
 }
 
@@ -545,6 +550,7 @@ function hideSearchHud(){
     $("#backgroundFade").fadeOut();
     $("#notes").fadeOut();
     $("#statsInfo").fadeOut();
+    $("#searchLog").fadeOut();
 }
 
 function showCancelSearch() {
@@ -577,4 +583,11 @@ function kFormatter(num) {
     return num > 999 ? (num/1000).toFixed(1) + 'k' : num;
 }
 
+function getLeaderboard() {
+    return $(ogario.leaderboardHTML).text();
+}
 
+function appendLog(message) {
+    $("#log").prepend('<p style="white-space: nowrap;margin-bottom: 10px;">'+
+                      '<a href="javascript:void(0)" class="" onclick="document.getElementById(\'searchInput\').value = this.text;" style="color: lightgrey;">'+message+'</a></p>');
+}
