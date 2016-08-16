@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.16
+// @version      2.0.17
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -260,9 +260,6 @@ setTimeout(function(){
 
     $("#minimap-sectors").attr("style", "opacity: 0.25;");
 
-    //$(".btn-donate").remove();
-    //$("#version").after('<a href="http://bit.ly/2ay9T4Z" class="btn-donate" target="_blank" style="float: right;">DONATE by click [AD]</a>');
-
     // fast table switch + spectate
 
 
@@ -339,7 +336,28 @@ setTimeout(function(){
     $("#note6").val(localStorage.getItem('note6'));
     $("#note7").val(localStorage.getItem('note7'));
 
-    getInfo();
+    // listen for server disconnect
+    MC.onDisconnect = function(){
+        toastr["error"]("Disconnected from server :(").css("width","210px");
+        appendLog(getLeaderboard());
+    };
+
+    $("#region").ready(function() {delay(1600, getInfo);});
+
+    $('body').on('click', '.logEntry', function () {
+
+        document.getElementById('searchInput').value = this.text;
+        bumpLog();
+        MC.setRegion($(this).data('region'));
+        getInfo();
+        searchPlayer($("#searchInput").val());
+
+    });
+
+    $("#region, #gamemode").change(function(){
+        appendLog(getLeaderboard());
+    });
+
 
     // ANNOUNCEMENTS
     toastr["info"]('KITTY mod v'+modVersion+': Now you can see game stats while searching, save your searches for later AND see your server history! Have fun :D');
@@ -365,8 +383,9 @@ function spectateWithDelay() {
 }
 
 function changeServer() {
-    //MC.refreshRegionInfo();
+
     MC.reconnect();
+    getInfo();
     appendLog(getLeaderboard());
 }
 
@@ -468,7 +487,7 @@ function searchPlayer(searchString) {
         clearInterval(timerId);
         searching = false;
         hideCancelSearch();
-        toastr["error"]("Search was canceled by user!").css("width","210px");
+        toastr["error"]("Search was canceled!").css("width","210px");
     }
 }
 
@@ -503,36 +522,6 @@ function copyLeaderboard() {
     document.execCommand('copy');
     $("#tempCopy").hide();
     $("#tempCopy").val("");
-}
-
-function getInfo() {
-
-    $.ajax({ type: "GET", url: "http://m.agar.io/info",
-            datatype: 'json',
-            success: function(info){
-
-                $('#currentRegion').html(MC.getRegion());
-
-                var regions = info.regions;
-                console.log(regions);
-
-                // find out current region
-                var currentRegion;
-                for (var key in regions) {
-                    if (key == MC.getRegion()) {
-                        currentRegion = regions[key];
-                        break;
-                    }
-
-                }
-                $('#numPlayers').html(kFormatter(currentRegion.numPlayers));
-                $('#totalPlayers').html(kFormatter(info.totals.numPlayers));
-                $('#numServers').html(currentRegion.numRealms);
-                $('#pps').html(Math.round(currentRegion.avgPlayersPerRealm));
-
-            }
-           });
-
 }
 
 function showSearchHud() {
@@ -578,16 +567,41 @@ function hideMenu() {
     $("#overlays").css("left", "-999em");
 }
 
-
-function kFormatter(num) {
-    return num > 999 ? (num/1000).toFixed(1) + 'k' : num;
-}
-
 function getLeaderboard() {
     return $(ogario.leaderboardHTML).text();
 }
 
+
+function bumpLog() {
+    $("#log").animate({scrollTop: 0}, "slow");
+}
+
+function getInfo() {
+    $.ajax({ type: "GET", url: "http://m.agar.io/info",
+            datatype: "json",
+            success: function(info){
+                $("#currentRegion").html(MC.getRegion());
+                var regions = info.regions;
+                var currentRegion;
+                for (var key in regions) {
+                    if (key == MC.getRegion()) {
+                        currentRegion = regions[key];break;
+                    }
+                }
+                console.log(info);
+                $("#numPlayers").html(kFormatter(currentRegion.numPlayers));
+                $("#totalPlayers").html(kFormatter(info.totals.numPlayers));
+                $("#numServers").html(currentRegion.numRealms);
+                $("#pps").html(Math.round(currentRegion.avgPlayersPerRealm));
+            }});}
+
+function kFormatter(num) {return num > 999 ? (num/1000).toFixed(1) + "k" : num;}
+
+
 function appendLog(message) {
+    var region = MC.getRegion();
     $("#log").prepend('<p style="white-space: nowrap;margin-bottom: 10px;">'+
-                      '<a href="javascript:void(0)" class="" onclick="document.getElementById(\'searchInput\').value = this.text;" style="color: lightgrey;">'+message+'</a></p>');
+                      '<span class="main-color">' + region.substring(0, 2)  + '</span> &nbsp;'+
+                      '<a href="javascript:void(0)" class="logEntry" data-region="'+ region +'" onclick="" style="color: lightgrey;">'+message+'</a></p>');
+    bumpLog();
 }
