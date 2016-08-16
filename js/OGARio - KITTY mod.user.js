@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.18
+// @version      2.0.19
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -271,7 +271,7 @@ setTimeout(function(){
                 $("#searchShortcut").click();
             }
 
-        } else if(event.which == 187 && !($("input").is(":focus"))) {
+        } else if(event.which == 187 && !($("input").is(":focus")) && !MC.isInGame()) {
             hideSearchHud();
             changeServer();
             spectateWithDelay();
@@ -360,6 +360,18 @@ setTimeout(function(){
         appendLog(getLeaderboard());
     });
 
+    var url = window.location.href;     // Returns full URL
+    if (url.length !== 21) {
+        $("#ogario-party").hide();
+    }
+
+    $("#gamemode").change(function(){
+        if ($("#gamemode").val() == ":party") {
+            $("#ogario-party").show();
+        } else {
+            $("#ogario-party").hide();
+        }
+    });
 
     // ANNOUNCEMENTS
     toastr["info"]('KITTY mod v'+modVersion+': Now you can see game stats while searching, save your searches for later AND see your server history! Have fun :D');
@@ -604,7 +616,7 @@ function appendLog(message) {
     var region = MC.getRegion();
     $("#log").prepend('<p style="display: none;white-space: nowrap;margin-bottom: 10px;">'+
                       '<span class="main-color">' + region.substring(0, 2)  + '</span> &nbsp;'+
-                      '<a href="javascript:void(0)" class="logEntry" data-region="'+ region +'" onclick="" style="color: lightgrey;">' + message + '</a></p>');
+                      '<a href="javascript:void(0);" class="logEntry" data-region="'+ region +'" onclick="" style="color: lightgrey;">' + message + '</a></p>');
 
     $("#log p").first().show(100);
     bumpLog();
