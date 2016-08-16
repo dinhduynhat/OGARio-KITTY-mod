@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.17
+// @version      2.0.18
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -196,7 +196,7 @@ setTimeout(function(){
         localStorage.setItem(event.target.id, $(event.target).val());
     });
 
-    $("#searchHud").after('<div id="searchLog" class="main-color" style="font-size: 13px;float: left;font-weight: 700;border-radius: 4px;width: 65%;height: 270px;z-index: 15;margin: auto;top: 0px;right: 0px;left: 0px;bottom: -390px;position: fixed;pointer-events: auto;color: rgb(255, 255, 255);padding: 10px;display: none;background-color: rgba(0, 0, 0, 0.2);"><h5 class="main-color text-center" style="margin-top: 0px;">Search log</h5>'+
+    $("#searchHud").after('<div id="searchLog" class="main-color" style="font-size: 13px;float: left;font-weight: 700;border-radius: 4px;width: 65%;height: 270px;z-index: 15;margin: auto;top: 0px;right: 0px;left: 0px;bottom: -390px;position: fixed;pointer-events: auto;color: rgb(255, 255, 255);padding: 10px;display: none;background-color: rgba(0, 0, 0, 0.2);"><h5 id="logTitle" class="main-color text-center" style="margin-top: 0px;">Leaderboard history</h5>'+
                           '<div id="log" style="font-weight: normal; overflow-x: hidden; overflow-y: auto;height: 90%;">'+
 
                           '</div></div>');
@@ -213,6 +213,8 @@ setTimeout(function(){
                                  'border: none;' +
                                  '"></a><input id="tempCopy" style="display: none;" value="">'+
                                  '</div>');
+
+    $("#logTitle").after('<a href="#" style="color: lightgrey;float: right;position: absolute;right: 12px;top: 9px;" class="main-color" onclick="$(\'#log\').html(\'\');" data-toggle="tooltip" data-placement="left" data-original-title="Clear list"><span class="glyphicon glyphicon-ban-circle"></span></a>');
 
     $('[data-toggle="tooltip"]').tooltip();
     $("#searchBtn").tooltip('disable');
@@ -339,7 +341,7 @@ setTimeout(function(){
     // listen for server disconnect
     MC.onDisconnect = function(){
         toastr["error"]("Disconnected from server :(").css("width","210px");
-        appendLog(getLeaderboard());
+        appendSysLog("DISCONNECTED :(");
     };
 
     $("#region").ready(function() {delay(1600, getInfo);});
@@ -600,8 +602,18 @@ function kFormatter(num) {return num > 999 ? (num/1000).toFixed(1) + "k" : num;}
 
 function appendLog(message) {
     var region = MC.getRegion();
-    $("#log").prepend('<p style="white-space: nowrap;margin-bottom: 10px;">'+
+    $("#log").prepend('<p style="display: none;white-space: nowrap;margin-bottom: 10px;">'+
                       '<span class="main-color">' + region.substring(0, 2)  + '</span> &nbsp;'+
-                      '<a href="javascript:void(0)" class="logEntry" data-region="'+ region +'" onclick="" style="color: lightgrey;">'+message+'</a></p>');
+                      '<a href="javascript:void(0)" class="logEntry" data-region="'+ region +'" onclick="" style="color: lightgrey;">' + message + '</a></p>');
+
+    $("#log p").first().show(100);
+    bumpLog();
+}
+
+function appendSysLog(message) {
+    $("#log").prepend('<p style="display: none;white-space: nowrap;margin-bottom: 10px;">'+
+                      '<span class="main-color">' + message  + '</span></p>');
+
+    $("#log p").first().show(100);
     bumpLog();
 }
