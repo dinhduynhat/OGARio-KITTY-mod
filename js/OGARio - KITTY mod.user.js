@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.19
+// @version      2.0.20
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -53,6 +53,8 @@ GM_xmlhttpRequest({
 **********/
 
 var modVersion = GM_info.script.version;
+var isPlaying = false;
+var currentIP = "0.0.0.0:0";
 
 setTimeout(function(){
 
@@ -190,7 +192,7 @@ setTimeout(function(){
                            'border-color: darkgrey;'+
                            '"></div>');
 
-    // notes
+    // save notes
 
     $(".note").keyup(function(event) {
         localStorage.setItem(event.target.id, $(event.target).val());
@@ -204,6 +206,8 @@ setTimeout(function(){
     $("#leaderboard-hud").append('<div id="leaderboard-menu">'+
                                  '<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
                                  '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
+                                 '<a id="copyLBBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 17.3%; text-shadow: rgb(0, 0, 0) 0.3px 0.3px; font-size: small; margin-top: 0px; display: none; border: none;" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy leaderboard (L)">LB</a>'+
+                                 '<a id="copyIPBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 16%; text-shadow: rgb(0, 0, 0) 0.3px 0.3px; font-size: small; margin-top: 0px; display: none; border: none;"  data-toggle="tooltip" data-placement="bottom" data-original-title="Copy IP address">IP</a>' +
                                  '<a id="og-reconnect-btn" class="btn btn-info btn-sm icon-loop2" title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Change server (+)" style="'+
                                  'width: 33.3%;'+
                                  'text-shadow: 0.3px 0.3px #000000;' +
@@ -214,19 +218,45 @@ setTimeout(function(){
                                  '"></a><input id="tempCopy" style="display: none;" value="">'+
                                  '</div>');
 
+    $("#searchShortcut, #og-reconnect-btn").mouseenter(function(){
+        $("#copyLBBtn").hide();
+        $("#copyIPBtn").hide();
+        $("#copyLeaderboardBtn").show();
+    });
+
+    $("#copyLeaderboardBtn").mouseenter(function(){
+        $(this).hide();
+        $("#copyLBBtn").show();
+        $("#copyIPBtn").show();
+    });
+
+    $("#leaderboard-menu").mouseleave(function() {
+        if (!$('#copyLBBtn').is(':hover') && !$('#copyIPBtn').is(':hover')) {
+
+            $("#copyLBBtn").hide();
+            $("#copyIPBtn").hide();
+            $("#copyLeaderboardBtn").show();
+        }
+    });
+
+
     $("#logTitle").after('<a href="#" style="color: lightgrey;float: right;position: absolute;right: 12px;top: 9px;" class="main-color" onclick="$(\'#log\').html(\'\');" data-toggle="tooltip" data-placement="left" data-original-title="Clear list"><span class="glyphicon glyphicon-ban-circle"></span></a>');
 
     $('[data-toggle="tooltip"]').tooltip();
     $("#searchBtn").tooltip('disable');
 
-    $("#copyLeaderboardBtn").click(function() {
-        copyLeaderboard();
+    $("#copyLBBtn").click(function() {
+        copy(getLeaderboard());
+    });
+
+    $("#copyIPBtn").click(function() {
+        copy("ws://" + currentIP);
     });
 
     $("#og-reconnect-btn").click(function(){
 
         changeServer();
-        if (ogario.spectate == true) {
+        if (!isPlaying && !$("#searchHud").is(':visible')) {
             hideSearchHud();
             spectateWithDelay();
         }
@@ -264,14 +294,13 @@ setTimeout(function(){
 
     // fast table switch + spectate
 
-
     $(document).keyup(function( event ) {
         if (event.which == 8) {
             if ($('input:focus').length == 0) {
                 $("#searchShortcut").click();
             }
 
-        } else if(event.which == 187 && !($("input").is(":focus")) && !MC.isInGame()) {
+        } else if(event.which == 187 && !($("input").is(":focus")) && !isPlaying) {
             hideSearchHud();
             changeServer();
             spectateWithDelay();
@@ -356,6 +385,14 @@ setTimeout(function(){
 
     });
 
+    $('body').on('click', '.btn-play-shortcut', function () {
+        play();
+    });
+    $('body').on('click', '.btn-spectate-shortcut', function () {
+        spectate();
+    });
+
+
     $("#region, #gamemode").change(function(){
         appendLog(getLeaderboard());
     });
@@ -370,6 +407,15 @@ setTimeout(function(){
             $("#ogario-party").show();
         } else {
             $("#ogario-party").hide();
+        }
+    });
+
+    MC._onPlayerSpawn = function(){isPlaying=true;};
+    MC._onPlayerDeath = function(){isPlaying=false;};
+
+    $(document).ajaxComplete(function(event, xhr, settings) {
+        if(xhr.responseJSON.hasOwnProperty('ip')){
+            currentIP = xhr.responseJSON.ip;
         }
     });
 
@@ -446,7 +492,7 @@ function searchPlayer(searchString) {
                 searching = false;
                 hideCancelSearch();
                 hideSearchHud();
-                toastr["info"]("Leaderboard found!").css("width","210px");
+                toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 40000, extendedTimeOut: 40000}).css("width","210px");
                 showMenu();
             } else {
                 changeServer();
@@ -481,7 +527,7 @@ function searchPlayer(searchString) {
                             searching = false;
                             hideCancelSearch();
                             hideSearchHud();
-                            toastr["info"]("Leaderboard found!").css("width","210px");
+                            toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 40000, extendedTimeOut: 40000}).css("width","210px");
                             showMenu();
                         } else {
                             //console.log("MC.isConnecting(): " + MC.isConnecting());
@@ -528,9 +574,9 @@ function foundNames(leaderboard, names, minNamesFound) {
 
 //
 
-function copyLeaderboard() {
+function copy(text) {
 
-    $("#tempCopy").val($(ogario.leaderboardHTML).text());
+    $("#tempCopy").val(text);
     $("#tempCopy").show();
     $("#tempCopy").select();
     document.execCommand('copy');
@@ -602,7 +648,7 @@ function getInfo() {
                         currentRegion = regions[key];break;
                     }
                 }
-                console.log(info);
+                //console.log(info);
                 $("#numPlayers").html(kFormatter(currentRegion.numPlayers));
                 $("#totalPlayers").html(kFormatter(info.totals.numPlayers));
                 $("#numServers").html(currentRegion.numRealms);
@@ -611,12 +657,23 @@ function getInfo() {
 
 function kFormatter(num) {return num > 999 ? (num/1000).toFixed(1) + "k" : num;}
 
+function clearNotifications() {
+    toastr.clear();
+}
+
+function play(){
+    $('*[data-itr="page_play"]').click();
+}
+
+function spectate(){
+    $('*[data-itr="page_spectate"]').click();
+}
 
 function appendLog(message) {
     var region = MC.getRegion();
     $("#log").prepend('<p style="display: none;white-space: nowrap;margin-bottom: 10px;">'+
                       '<span class="main-color">' + region.substring(0, 2)  + '</span> &nbsp;'+
-                      '<a href="javascript:void(0);" class="logEntry" data-region="'+ region +'" onclick="" style="color: lightgrey;">' + message + '</a></p>');
+                      '<a href="javascript:void(0);" class="logEntry" data-region="'+ region +'" onclick="" style="color: lightgrey; font-size: 14px;">' + message + '</a></p>');
 
     $("#log p").first().show(100);
     bumpLog();
