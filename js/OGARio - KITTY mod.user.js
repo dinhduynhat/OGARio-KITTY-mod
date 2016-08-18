@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.0.20
+// @version      2.2.0
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -15,8 +15,9 @@
 // Copyright © 2016 ogario.ovh
 
 if (location.host == "agar.io" && location.pathname == "/") {
-    location.href = "http://agar.io/ogario" + location.hash;
-    return;
+
+    location.href = "http://agar.io/ogario" + window.location.search + location.hash;
+    //return;
 }
 
 var ogarioJS = '<script src="http://ogario.ovh/download/v21/ogario.v2.js" charset="utf-8"></script>';
@@ -136,7 +137,7 @@ setTimeout(function(){
                                'bottom: 0;' +
                                'position: fixed;">' +
                                '<div id="" style="margin-top: 10px;">' +
-                               '<input id="searchInput" class="form-control" title="" placeholder="Enter friend\'s leaderboard, name or clan tag..." style="margin-bottom: 10px;float: left;width: 74% !important;text-align: center;">' +
+                               '<input id="searchInput" class="form-control" title="" placeholder="Enter friend\'s IP, leaderboard, name or clan tag..." style="margin-bottom: 10px;float: left;width: 74% !important;text-align: center;">' +
                                '<button id="closeBtn" class="btn btn-copy-token copy-party-token" data-toggle="tooltip" style="color: #ffffff;margin-bottom:10px;width: 10%;" data-placement="right" data-original-title="Close" title=""><span class="glyphicon glyphicon-remove-circle"></span></button>' +
                                '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" data-placement="bottom" data-original-title="Cancel search" style="margin-bottom:10px;width: 15%;"><span id="searchSpan" class="glyphicon glyphicon-search"></span></button></div></div>');
 
@@ -250,7 +251,7 @@ setTimeout(function(){
     });
 
     $("#copyIPBtn").click(function() {
-        copy("ws://" + currentIP);
+        copy("http://agar.io/?search=ws://" + currentIP);
     });
 
     $("#og-reconnect-btn").click(function(){
@@ -263,8 +264,8 @@ setTimeout(function(){
     });
 
     $("#searchBtn").click(function(){
-        var searchString = $("#searchInput").val().trim();
-        searchPlayer(searchString);
+        var searchString = $("#searchInput").val();
+        searchHandler(searchString);
     });
     $("#searchInput").keyup(function(event){
         if(event.keyCode == 13){
@@ -278,13 +279,7 @@ setTimeout(function(){
     $("#searchShortcut").click(function() {
         hideMenu();
         showSearchHud();
-        /*var lstfocus=$("#searchInput");
-        $("body").click(function(){
-            if ($(':focus').is("input")){
-                lstfocus= $(':focus');
-            }
-            lstfocus.focus();
-        });*/
+
         $("#searchInput").focus().select();
     });
 
@@ -345,7 +340,7 @@ setTimeout(function(){
             showSearchHud();
             $("#searchInput").val(pastedData);
             $("#searchInput").select();
-            searchPlayer(pastedData);
+            searchHandler(pastedData);
         }
     } );
 
@@ -354,7 +349,7 @@ setTimeout(function(){
             var pastedData = e.originalEvent.clipboardData.getData('text');
             $("#searchInput").val(pastedData);
             $("#searchInput").select();
-            searchPlayer(pastedData);
+            searchHandler(pastedData);
         }
     } );
 
@@ -381,7 +376,7 @@ setTimeout(function(){
         bumpLog();
         MC.setRegion($(this).data('region'));
         getInfo();
-        searchPlayer($("#searchInput").val());
+        searchHandler($("#searchInput").val());
 
     });
 
@@ -414,13 +409,33 @@ setTimeout(function(){
     MC._onPlayerDeath = function(){isPlaying=false;};
 
     $(document).ajaxComplete(function(event, xhr, settings) {
-        if(xhr.responseJSON.hasOwnProperty('ip')){
+        //console.log(xhr);
+        if(xhr.responseJSON != null && xhr.responseJSON.ip != null && xhr.responseJSON.hasOwnProperty('ip')){
             currentIP = xhr.responseJSON.ip;
         }
     });
 
+    // search IP in query
+    setTimeout(function() {
+
+        $("body").append('<div id="lol"></div>');
+        $("#lol").text(window.location.href);
+        var escaped = $("#lol").text(window.location.href).html();
+        var searchStr = getParameterByName("search", escaped);
+        $("#lol").remove();
+
+        if (searchStr != null && searchStr) {
+            if ( searchIPHandler(searchStr)) {
+                showSearchHud();
+                showCancelSearch();
+                $("#searchInput").val(searchStr);
+            }
+        }
+
+    }, 6000);
+
     // ANNOUNCEMENTS
-    toastr["info"]('KITTY mod v'+modVersion+': Now you can see game stats while searching, save your searches for later AND see your server history! Have fun :D');
+    toastr["info"]('KITTY mod v'+modVersion+': Search by server IP is now supported and recommended over normal search! Have fun :D');
     toastr["info"]('Don\'t forget to share! </br>My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
 
 }, 5000);
@@ -445,17 +460,136 @@ function spectateWithDelay() {
 function changeServer() {
 
     MC.reconnect();
-    getInfo();
+    //getInfo();
     appendLog(getLeaderboard());
 }
+
+function isValidIpAndPort(input) {
+    var parts = input.split(":");
+    var ip = parts[0].split(".");
+    var port = parts[1];
+    return validateNum(port, 1, 65535) &&
+        ip.length == 4 &&
+        ip.every(function (segment) {
+        return validateNum(segment, 0, 255);
+    });
+}
+
+function validateNum(input, min, max) {
+    var num = +input;
+    return num >= min && num <= max && input === num.toString();
+}
+
+function searchHandler(searchStr){
+
+    searchStr = searchStr.trim();
+
+    if (searchIPHandler(searchStr)) {
+        // is an IP
+    } else {
+        searchPlayer(searchStr);
+    }
+
+}
+
+function searchIPHandler(searchStr) {
+    searchStr = searchStr.trim();
+
+    if (isValidIpAndPort(searchStr)) {
+        findIP(searchStr);
+    } else if (isValidIpAndPort(searchStr.replace("ws://", ""))) {
+        findIP(searchStr.replace("ws://", ""));
+    } else if (isValidIpAndPort(searchStr.replace("agar.io/?search=ws://", ""))) {
+        findIP(searchStr.replace("agar.io/?search=ws://", ""));
+    } else if (isValidIpAndPort(searchStr.replace("http://agar.io/?search=ws://", ""))) {
+        findIP(searchStr.replace("http://agar.io/?search=ws://", ""));
+    } else {
+        return false;
+    }
+    return true;
+}
+
+function findIP(searchIP) {
+
+    if (!searching) {
+
+        if($.trim(searchIP) == ''){
+
+        } else {
+            showCancelSearch();
+
+            searching = true;
+
+            var interval = 1800;
+            var maxTries = 30;
+            var numTries = 0;
+
+            var numAttempts = 0;
+            var maxAttempts = 2;
+
+            toastr["success"]("Searching IP \'ws://" + searchIP + "\'...").css("width","210px");
+
+            numTries++;
+
+            if (currentIP == searchIP) {
+                searching = false;
+                hideCancelSearch();
+                hideSearchHud();
+                toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 20000, extendedTimeOut: 20000}).css("width","210px");
+                showMenu();
+            } else {
+
+                changeServer();
+
+                timerId = setInterval(function(){
+
+                    if (MC.isConnecting() == false || numAttempts == maxAttempts) {
+                        numAttempts = 0;
+                        //console.log("MC.isConnecting(): " + MC.isConnecting());
+
+                        numTries++;
+                        toastr["success"]("Search: " + numTries + "\/" + maxTries).css("width","210px");
+                        if (numTries >= maxTries) {
+                            clearInterval(timerId);
+                            searching = false;
+                            hideCancelSearch();
+                            toastr["error"]("The leaderboard was not found. Keep trying...").css("width","210px");
+                        }
+                        if (currentIP == searchIP) {
+                            clearInterval(timerId);
+                            searching = false;
+                            hideCancelSearch();
+                            hideSearchHud();
+                            toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 20000, extendedTimeOut: 20000}).css("width","210px");
+                            showMenu();
+                        } else {
+                            //console.log("MC.isConnecting(): " + MC.isConnecting());
+                            changeServer();
+                        }
+                    } else {
+                        numAttempts++;
+                        //console.log("numAttempts: " + numAttempts);
+                    }
+                }, interval);
+
+            }
+        }
+    } else {
+        clearInterval(timerId);
+        searching = false;
+        hideCancelSearch();
+        toastr["error"]("Search was canceled!").css("width","210px");
+    }
+}
+
 
 function searchPlayer(searchString) {
     if (!searching) {
 
-        if($.trim($("#searchInput").val()) == ''){
+        if($.trim(searchString) == ''){
 
         } else {
-            //console.log("MC.isConnecting(): " + MC.isConnecting());
+
             showCancelSearch();
 
             searching = true;
@@ -473,10 +607,10 @@ function searchPlayer(searchString) {
 
             var leaderboard = getLeaderboard();
             var names = searchString.split(/[1-9]\.\s|10\.\s/g).filter(function(el) {return el.length != 0;});
-            console.log(leaderboard);
+            //console.log(leaderboard);
 
             var numNames = names.length;
-            console.log("Number of names: " + numNames);
+            //console.log("Number of names: " + numNames);
 
             var found = false;
             numTries++;
@@ -492,7 +626,7 @@ function searchPlayer(searchString) {
                 searching = false;
                 hideCancelSearch();
                 hideSearchHud();
-                toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 40000, extendedTimeOut: 40000}).css("width","210px");
+                toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 20000, extendedTimeOut: 20000}).css("width","210px");
                 showMenu();
             } else {
                 changeServer();
@@ -503,11 +637,11 @@ function searchPlayer(searchString) {
 
                     if (MC.isConnecting() == false || numAttempts == maxAttempts) {
                         numAttempts = 0;
-                        console.log("MC.isConnecting(): " + MC.isConnecting());
+                        //console.log("MC.isConnecting(): " + MC.isConnecting());
                         leaderboard = $(ogario.leaderboardHTML).text();
 
-                        console.log(leaderboard);
-                        console.log("Number of names: " + numNames);
+                        //console.log(leaderboard);
+                        //console.log("Number of names: " + numNames);
 
                         if (numNames == 1) {
                             found = foundName(leaderboard, searchString);
@@ -527,7 +661,7 @@ function searchPlayer(searchString) {
                             searching = false;
                             hideCancelSearch();
                             hideSearchHud();
-                            toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 40000, extendedTimeOut: 40000}).css("width","210px");
+                            toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 20000, extendedTimeOut: 20000}).css("width","210px");
                             showMenu();
                         } else {
                             //console.log("MC.isConnecting(): " + MC.isConnecting());
@@ -535,7 +669,7 @@ function searchPlayer(searchString) {
                         }
                     } else {
                         numAttempts++;
-                        console.log("numAttempts: " + numAttempts);
+                        //console.log("numAttempts: " + numAttempts);
                     }
                 }, interval);
             }
@@ -568,7 +702,7 @@ function foundNames(leaderboard, names, minNamesFound) {
 
     //if (countFound >= minNamesFound) {alert(countFound);}
 
-    console.log("found: " + countFound);
+    //console.log("found: " + countFound);
     return (countFound >= minNamesFound) ? true : false;
 }
 
@@ -685,4 +819,14 @@ function appendSysLog(message) {
 
     $("#log p").first().show(100);
     bumpLog();
+}
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
