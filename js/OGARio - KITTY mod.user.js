@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.2.0
+// @version      2.2.1
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -54,7 +54,6 @@ GM_xmlhttpRequest({
 **********/
 
 var modVersion = GM_info.script.version;
-var isPlaying = false;
 var currentIP = "0.0.0.0:0";
 
 setTimeout(function(){
@@ -257,7 +256,7 @@ setTimeout(function(){
     $("#og-reconnect-btn").click(function(){
 
         changeServer();
-        if (!isPlaying && !$("#searchHud").is(':visible')) {
+        if (!$("#searchHud").is(':visible') && (!ogario.play || ogario.spectate)) {
             hideSearchHud();
             spectateWithDelay();
         }
@@ -295,10 +294,8 @@ setTimeout(function(){
                 $("#searchShortcut").click();
             }
 
-        } else if(event.which == 187 && !($("input").is(":focus")) && !isPlaying) {
-            hideSearchHud();
-            changeServer();
-            spectateWithDelay();
+        } else if(event.which == 187 && !($("input").is(":focus"))) {
+            $("#og-reconnect-btn").click();
         }
     });
 
@@ -404,9 +401,6 @@ setTimeout(function(){
             $("#ogario-party").hide();
         }
     });
-
-    MC._onPlayerSpawn = function(){isPlaying=true;};
-    MC._onPlayerDeath = function(){isPlaying=false;};
 
     $(document).ajaxComplete(function(event, xhr, settings) {
         //console.log(xhr);
@@ -830,3 +824,4 @@ function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
