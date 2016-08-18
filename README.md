@@ -22,6 +22,10 @@ KITTY mod is OGARio with more awesome features:
 
 ### Screenshot
 
-![alt tag](http://i.imgur.com/oJWt7D1.png)
+#### Main menu
+![alt tag](http://image.prntscr.com/image/766c8185b605441e880f39218c99b072.png)
+
+#### Search
+![alt tag](http://image.prntscr.com/image/723293dea9b4411ba32942c910f83393.png)
 
 ###### *Disclaimer: I am not the author of OGARio extension, I have only added code to Tampermonkey script to extend the existing OGARio features.*
