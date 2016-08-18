@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.2.1
+// @version      2.2.2
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -255,11 +255,14 @@ setTimeout(function(){
 
     $("#og-reconnect-btn").click(function(){
 
+        hideMenu();
         changeServer();
-        if (!$("#searchHud").is(':visible') && (!ogario.play || ogario.spectate)) {
+
+        if (!$("#searchHud").is(':visible')) {
             hideSearchHud();
             spectateWithDelay();
         }
+
     });
 
     $("#searchBtn").click(function(){
@@ -294,7 +297,8 @@ setTimeout(function(){
                 $("#searchShortcut").click();
             }
 
-        } else if(event.which == 187 && !($("input").is(":focus"))) {
+        } else if(event.which == 187 && !($("input").is(":focus")) && ogario.play == false) {
+
             $("#og-reconnect-btn").click();
         }
     });
@@ -369,11 +373,11 @@ setTimeout(function(){
 
     $('body').on('click', '.logEntry', function () {
 
-        document.getElementById('searchInput').value = this.text;
+        document.getElementById('searchInput').value = $(this).data('ip');
         bumpLog();
         MC.setRegion($(this).data('region'));
         getInfo();
-        searchHandler($("#searchInput").val());
+        searchIPHandler($("#searchInput").val());
 
     });
 
@@ -420,6 +424,7 @@ setTimeout(function(){
 
         if (searchStr != null && searchStr) {
             if ( searchIPHandler(searchStr)) {
+                hideMenu();
                 showSearchHud();
                 showCancelSearch();
                 $("#searchInput").val(searchStr);
@@ -454,7 +459,6 @@ function spectateWithDelay() {
 function changeServer() {
 
     MC.reconnect();
-    //getInfo();
     appendLog(getLeaderboard());
 }
 
@@ -801,7 +805,7 @@ function appendLog(message) {
     var region = MC.getRegion();
     $("#log").prepend('<p style="display: none;white-space: nowrap;margin-bottom: 10px;">'+
                       '<span class="main-color">' + region.substring(0, 2)  + '</span> &nbsp;'+
-                      '<a href="javascript:void(0);" class="logEntry" data-region="'+ region +'" onclick="" style="color: lightgrey; font-size: 14px;">' + message + '</a></p>');
+                      '<a href="javascript:void(0);" class="logEntry" data-region="'+ region +'" data-ip="ws://'+currentIP+'" onclick="" style="color: lightgrey; font-size: 14px;">' + message + '</a></p>');
 
     $("#log p").first().show(100);
     bumpLog();
