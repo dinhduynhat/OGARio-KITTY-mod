@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.2.2
+// @version      2.2.3
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -29,7 +29,7 @@ var toastrJS = '<script src="http://ogario.ovh/download/v2/dep/toastr.min.js" ch
 var toastrCSS = '<link href="http://ogario.ovh/download/v2/dep/toastr.min.css" rel="stylesheet"></link>';
 
 function inject(page) {
-    var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS  + "</head>");
+    var _page = page.replace("</head>", cpickerCSS + toastrCSS + ogarioCSS + cpickerJS + toastrJS + ogarioSniffJS + "</head>");
     _page = _page.replace(/<script.*?>[\s]*?.*?window\.NREUM[\s\S]*?<\/script>/, "");
     _page = _page.replace(/<script.*?src=".*?agario\.core\.js.*?><\/script>/, "");
     _page = _page.replace("</body>", ogarioJS + "</body>");
@@ -382,9 +382,13 @@ setTimeout(function(){
     });
 
     $('body').on('click', '.btn-play-shortcut', function () {
+        hideSearchHud();
+        toastr.clear();
         play();
     });
     $('body').on('click', '.btn-spectate-shortcut', function () {
+        hideSearchHud();
+        toastr.clear();
         spectate();
     });
 
@@ -532,9 +536,9 @@ function findIP(searchIP) {
             if (currentIP == searchIP) {
                 searching = false;
                 hideCancelSearch();
-                hideSearchHud();
+                //hideSearchHud();
                 toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 20000, extendedTimeOut: 20000}).css("width","210px");
-                showMenu();
+                //showMenu();
             } else {
 
                 changeServer();
@@ -557,9 +561,9 @@ function findIP(searchIP) {
                             clearInterval(timerId);
                             searching = false;
                             hideCancelSearch();
-                            hideSearchHud();
+                            //hideSearchHud();
                             toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 20000, extendedTimeOut: 20000}).css("width","210px");
-                            showMenu();
+                            //showMenu();
                         } else {
                             //console.log("MC.isConnecting(): " + MC.isConnecting());
                             changeServer();
@@ -623,9 +627,9 @@ function searchPlayer(searchString) {
             if (found) {
                 searching = false;
                 hideCancelSearch();
-                hideSearchHud();
+                //hideSearchHud();
                 toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 20000, extendedTimeOut: 20000}).css("width","210px");
-                showMenu();
+                //showMenu();
             } else {
                 changeServer();
 
@@ -658,9 +662,9 @@ function searchPlayer(searchString) {
                             clearInterval(timerId);
                             searching = false;
                             hideCancelSearch();
-                            hideSearchHud();
+                            //hideSearchHud();
                             toastr["info"]('Leaderboard found!</br> <button class="btn btn-sm btn-primary btn-play btn-play-shortcut" style="margin-top: 10px;border-color: darkblue;">PLAY</button><br><button class="btn btn-sm btn-warning btn-spectate btn-spectate-shortcut" style="width: 100%;margin-top: 10px;">SPECTATE</button>', "", {timeOut: 20000, extendedTimeOut: 20000}).css("width","210px");
-                            showMenu();
+                            //showMenu();
                         } else {
                             //console.log("MC.isConnecting(): " + MC.isConnecting());
                             changeServer();
