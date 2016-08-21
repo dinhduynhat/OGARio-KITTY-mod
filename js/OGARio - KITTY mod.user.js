@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.2.4
+// @version      2.2.5
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -250,7 +250,7 @@ setTimeout(function(){
     });
 
     $("#copyIPBtn").click(function() {
-        copy("http://agar.io/?search=ws://" + currentIP);
+        copy("http://agar.io/?r=" + MC.getRegion() + "&m=" + getGameMode() + "&search=ws://" + currentIP);
     });
 
     $("#og-reconnect-btn").click(function(){
@@ -371,6 +371,12 @@ setTimeout(function(){
         appendSysLog("DISCONNECTED :(");
     };
 
+    // listen for player ban
+    MC.onPlayerBanned  = function(){
+        toastr["error"]("You were banned :(").css("width","210px");
+        appendSysLog("BAN :(");
+    };
+
     $("#region").ready(function() {delay(1600, getInfo);});
 
     $('body').on('click', '.logEntry', function () {
@@ -419,16 +425,24 @@ setTimeout(function(){
         }
     });
 
+    // bug fix
+    MC.setRegion(localStorage.getItem("location"));
+
     // search IP in query
     setTimeout(function() {
 
-        $("body").append('<div id="lol"></div>');
-        $("#lol").text(window.location.href);
-        var escaped = $("#lol").text(window.location.href).html();
-        var searchStr = getParameterByName("search", escaped);
-        $("#lol").remove();
+        var url = window.location.href;
+        var region = getParameterByName("r", url);
+        var mode = getParameterByName("m", url);
+        var searchStr = getParameterByName("search", url);
+
+        if (region) {
+            MC.setRegion(region);
+        }
+        MC.setGameMode(mode);
 
         if (searchStr != null && searchStr) {
+
             if ( searchIPHandler(searchStr)) {
                 hideMenu();
                 showSearchHud();
@@ -769,6 +783,10 @@ function getLeaderboard() {
     return $(ogario.leaderboardHTML).text();
 }
 
+function getGameMode(){
+    return $("#gamemode").val();
+}
+
 
 function bumpLog() {
     $("#log").animate({scrollTop: 0}, "slow");
@@ -834,4 +852,16 @@ function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
+function getQueryVariable(variable, url)
+{
+    var query = url.substring(1);
+    var vars = query.split("&amp;");
+    for (var i=0;i<vars.length;i++) {
+        var pair = vars[i].split("=");
+        if(pair[0] == name){return pair[1];}
+    }
+    return(false);
+}
+
 
