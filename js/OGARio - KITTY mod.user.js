@@ -521,6 +521,19 @@ function searchIPHandler(searchStr) {
         findIP(searchStr.replace("agar.io/?search=ws://", ""));
     } else if (isValidIpAndPort(searchStr.replace("http://agar.io/?search=ws://", ""))) {
         findIP(searchStr.replace("http://agar.io/?search=ws://", ""));
+    } else if (getParameterByName("search", searchStr)) {
+
+        var region = getParameterByName("r", searchStr);
+        var mode = getParameterByName("m", searchStr);
+        var ip = getParameterByName("search", searchStr);
+
+        if (region) {
+            MC.setRegion(region);
+        }
+        MC.setGameMode(mode);
+
+        findIP(ip.replace("ws://", ""));
+
     } else {
         return false;
     }
