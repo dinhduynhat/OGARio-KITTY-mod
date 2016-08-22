@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.2.5
+// @version      2.3.0
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -55,6 +55,7 @@ GM_xmlhttpRequest({
 
 var modVersion = GM_info.script.version;
 var currentIP = "0.0.0.0:0";
+var currentToken = "";
 
 setTimeout(function(){
 
@@ -259,7 +260,7 @@ setTimeout(function(){
         changeServer();
 
         if (!$("#searchHud").is(':visible')) {
-            spectate();
+            delay(200, spectate);
         }
     });
 
@@ -290,31 +291,33 @@ setTimeout(function(){
     // keybinds
 
     $(document).keyup(function( event ) {
-        if (event.which == 8) {
+
+        if (event.which == 8) { // search
             if ($('input:focus').length == 0) {
                 $("#searchShortcut").click();
             }
 
-        } else if(event.which == 187 && !($("input").is(":focus")) && ogario.play == false) {
+        } else if(event.which == 187 && !($("input").is(":focus")) && ogario.play == false) { // refresh server
 
             $("#og-reconnect-btn").click();
 
-        } else if (event.which == 81 && ogario.spectate) {
-            spectate();
-        }
+        } else if (event.which == 27) { // ESCAPE
 
-    });
-
-    $(document).keyup(function( event ) {
-
-        if (event.which == 27) {
             if ($('#searchHud').is(':visible')) {
                 hideSearchHud();
             } else {
                 showMenu();
             }
         }
+
     });
+
+    $(document).keydown(function( event ) {
+        if (event.which == 81 && ogario.spectate && !($("input").is(":focus"))) { // spectate 'Q' fix
+            spectate();
+        }
+    });
+
 
 
     $("#time-hud").attr("style", "top: 290px !important;");
@@ -405,23 +408,31 @@ setTimeout(function(){
         appendLog(getLeaderboard());
     });
 
-    var url = window.location.href;     // Returns full URL
-    if (url.length !== 21) {
+    // hide party form
+    //var url = window.location.href;     // Returns full URL
+    /*if (url.length !== 21) {
         $("#ogario-party").hide();
-    }
+    }*/
 
-    $("#gamemode").change(function(){
+    /*$("#gamemode").change(function(){
         if ($("#gamemode").val() == ":party") {
             $("#ogario-party").show();
         } else {
             $("#ogario-party").hide();
         }
-    });
+    });*/
 
     $(document).ajaxComplete(function(event, xhr, settings) {
         //console.log(xhr);
-        if(xhr.responseJSON != null && xhr.responseJSON.ip != null && xhr.responseJSON.hasOwnProperty('ip')){
-            currentIP = xhr.responseJSON.ip;
+        if(xhr.responseJSON != null) {
+            if (xhr.responseJSON.ip != null && xhr.responseJSON.hasOwnProperty('ip')){
+                currentIP = xhr.responseJSON.ip;
+            }
+
+            if (xhr.responseJSON.token != null && xhr.responseJSON.hasOwnProperty('token')){
+                currentToken = xhr.responseJSON.token;
+                $("#joinPartyToken").val("agar.io/#" + currentToken);
+            }
         }
     });
 
@@ -436,10 +447,11 @@ setTimeout(function(){
         var mode = getParameterByName("m", url);
         var searchStr = getParameterByName("search", url);
 
-        if (region) {
+        if (region && url.length !== 21) {
             MC.setRegion(region);
+            MC.setGameMode(mode);
         }
-        MC.setGameMode(mode);
+
 
         if (searchStr != null && searchStr) {
 
@@ -453,8 +465,10 @@ setTimeout(function(){
 
     }, 6000);
 
+    $("#joinPartyToken").attr("placeholder", "Server token");
+
     // ANNOUNCEMENTS
-    toastr["info"]('KITTY mod v'+modVersion+': Search by server IP is now supported and recommended over normal search! Have fun :D');
+    toastr["info"]('KITTY mod v'+modVersion+': Direct connect is now possible using tokens agar.io/#XXXX!! Have fun :D');
     toastr["info"]('Don\'t forget to share! </br>My website: <a target="_blank" href="https://github.com/KindKitty/OGARio-KITTY-mod">LINK</a>');
 
 }, 5000);
@@ -472,12 +486,7 @@ function spectate() {
     $(".btn-spectate").click();
 }
 
-function spectateWithDelay() {
-    delay(1000, spectate);
-}
-
 function changeServer() {
-
     MC.reconnect();
     appendLog(getLeaderboard());
 }
@@ -529,6 +538,7 @@ function searchIPHandler(searchStr) {
 
         if (region) {
             MC.setRegion(region);
+            getInfo();
         }
         MC.setGameMode(mode);
 
