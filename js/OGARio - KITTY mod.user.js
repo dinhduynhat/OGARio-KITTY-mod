@@ -413,7 +413,7 @@ setTimeout(function(){
     $("#gamemode").change(function(){
         if ($("#gamemode").val() == ":party") {
             $("#ogario-party").show();
-            $("#joinPartyToken").val();
+            $("#joinPartyToken").val("");
         } else {
             $("#ogario-party").hide();
         }
@@ -435,7 +435,6 @@ setTimeout(function(){
 
             if (xhr.responseJSON.token != null && xhr.responseJSON.hasOwnProperty('token')){
                 currentToken = xhr.responseJSON.token;
-                $("#joinPartyToken").val("agar.io/#" + currentToken);
             }
 
 
@@ -495,8 +494,6 @@ setTimeout(function(){
 
 
     }, 5000);
-
-    $("#joinPartyToken").attr("placeholder", "Server token");
 
     // ANNOUNCEMENTS
     toastr["info"]('KITTY mod v'+modVersion+': Direct connect is now possible using tokens agar.io/#XXXX!! Have fun :D');
