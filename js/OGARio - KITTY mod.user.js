@@ -555,10 +555,10 @@ function searchHandler(searchStr){
 function searchTKHandler(searchStr) {
     searchStr = searchStr.trim();
 
-
-    if (searchStr.length == 21 && searchStr.startsWith("http://agar.io/#")) {
-
+    if (searchStr.startsWith("http://agar.io/#")) {
         joinToken(searchStr.replace("http://agar.io/#", ""));
+    } else if (searchStr.startsWith("agar.io/#")) {
+        joinToken(searchStr.replace("agar.io/#", ""));
     } else {
         return false;
     }
