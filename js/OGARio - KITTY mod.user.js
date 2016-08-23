@@ -57,6 +57,8 @@ var modVersion = GM_info.script.version;
 var currentIP = "0.0.0.0:0";
 var currentToken = "";
 
+var previousMode = previousMode = localStorage.getItem("gamemode");
+
 setTimeout(function(){
 
     var aTags = document.getElementsByTagName("button");
@@ -375,15 +377,14 @@ setTimeout(function(){
         appendSysLog("BAN :(");
     };
 
-    $("#region").ready(function() {delay(1600, getInfo);});
+    $("#region").ready(function() {delay(2000, getInfo);});
 
     $('body').on('click', '.logEntry', function () {
 
-        document.getElementById('searchInput').value = $(this).data('ip');
+        document.getElementById('searchInput').value = "http://agar.io/#" + $(this).data('token');
         bumpLog();
-        MC.setRegion($(this).data('region'));
         getInfo();
-        searchIPHandler($("#searchInput").val());
+        searchTKHandler($("#searchInput").val());
 
     });
 
@@ -416,6 +417,11 @@ setTimeout(function(){
         } else {
             $("#ogario-party").hide();
         }
+         localStorage.setItem("gamemode", ogario.gameMode);
+    });
+
+    $("#region").change(function(){
+        localStorage.setItem("location2", MC.getRegion());
     });
 
     $(document).ajaxComplete(function(event, xhr, settings) {
@@ -451,13 +457,10 @@ setTimeout(function(){
         }
     });
 
-    // bug fix
-    MC.setRegion(localStorage.getItem("location"));
-
     // search IP in query
     setTimeout(function() {
 
-        var url = window.location.href;
+         var url = window.location.href;
         var region = getParameterByName("r", url);
         var mode = getParameterByName("m", url);
         var searchStr = getParameterByName("search", url);
@@ -467,9 +470,14 @@ setTimeout(function(){
             currentToken = url.replace("http://agar.io/#", "");
 
         } else{
-            if (region) {
+            if (region != null) {
+
                 MC.setRegion(region);
                 MC.setGameMode(mode);
+            } else {
+                // bug fix
+                MC.setRegion(localStorage.getItem("location2"));
+                MC.setGameMode(previousMode);
             }
         }
 
@@ -486,7 +494,7 @@ setTimeout(function(){
 
 
 
-    }, 6000);
+    }, 5000);
 
     $("#joinPartyToken").attr("placeholder", "Server token");
 
@@ -510,6 +518,7 @@ function spectate() {
 }
 
 function changeServer() {
+    MC.setGameMode(ogario.gameMode);
     MC.reconnect();
     appendLog(getLeaderboard());
 }
@@ -535,7 +544,8 @@ function joinToken(token) {
     $("#joinPartyToken").val(token);
     $("#join-party-btn").click();
     $("#joinPartyToken").val("");
-
+    $("#gamemode").val("");
+    currentToken = token;
 }
 
 function searchHandler(searchStr){
@@ -899,7 +909,7 @@ function appendLog(message) {
     var region = MC.getRegion();
     $("#log").prepend('<p style="display: none;white-space: nowrap;margin-bottom: 10px;">'+
                       '<span class="main-color">' + region.substring(0, 2)  + '</span> &nbsp;'+
-                      '<a href="javascript:void(0);" class="logEntry" data-region="'+ region +'" data-ip="ws://'+currentIP+'" onclick="" style="color: lightgrey; font-size: 14px;">' + message + '</a></p>');
+                      '<a href="javascript:void(0);" class="logEntry" data-token="'+currentToken+'" style="color: lightgrey; font-size: 14px;">' + message + '</a></p>');
 
     $("#log p").first().show(100);
     bumpLog();
