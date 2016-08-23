@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         OGARio by szymy 2.1 (KITTY mod v2)
 // @namespace    ogario.v2
-// @version      2.3.0
+// @version      2.3.1
 // @description  OGARio - KITTY mod v2
 // @author       szymy and KITTY (mod only)
 // @match        http://agar.io/*
@@ -137,7 +137,7 @@ setTimeout(function(){
                                'bottom: 0;' +
                                'position: fixed;">' +
                                '<div id="" style="margin-top: 10px;">' +
-                               '<input id="searchInput" class="form-control" title="" placeholder="Enter friend\'s IP, leaderboard, name or clan tag..." style="margin-bottom: 10px;float: left;width: 74% !important;text-align: center;">' +
+                               '<input id="searchInput" class="form-control" title="" placeholder="Enter friend\'s token, IP, leaderboard, name or clan tag..." style="margin-bottom: 10px;float: left;width: 74% !important;text-align: center;">' +
                                '<button id="closeBtn" class="btn btn-copy-token copy-party-token" data-toggle="tooltip" style="color: #ffffff;margin-bottom:10px;width: 10%;" data-placement="right" data-original-title="Close" title=""><span class="glyphicon glyphicon-remove-circle"></span></button>' +
                                '<button id="searchBtn" class="btn btn-copy-token copy-party-token btn-primary" data-toggle="tooltip" data-placement="bottom" data-original-title="Cancel search" style="margin-bottom:10px;width: 15%;"><span id="searchSpan" class="glyphicon glyphicon-search"></span></button></div></div>');
 
@@ -206,38 +206,29 @@ setTimeout(function(){
 
     $("#leaderboard-hud").append('<div id="leaderboard-menu">'+
                                  '<a id="searchShortcut" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" data-original-title="Find learderboard (Backspace)" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;border-top-color: rgb(141, 201, 64);border-bottom-style: none;border-left-style: none;border: none;margin-top: 0px;" data-original-title="Search leaderboards" title=""><span id="searchSpan" class="glyphicon glyphicon-search"></span></a>'+
-                                 '<a id="copyLeaderboardBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border-top-color: rgb(141, 201, 64); *//* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;/* margin-top: 0px; */">Copy</a>'+
-                                 '<a id="copyLBBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 17.3%; text-shadow: rgb(0, 0, 0) 0.3px 0.3px; font-size: small; margin-top: 0px; display: none; border: none;" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy leaderboard (L)">LB</a>'+
-                                 '<a id="copyIPBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 16%; text-shadow: rgb(0, 0, 0) 0.3px 0.3px; font-size: small; margin-top: 0px; display: none; border: none;"  data-toggle="tooltip" data-placement="bottom" data-original-title="Copy IP address">IP</a>' +
+                                 '<a id="copyLBBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 33.3%;text-shadow: 0.3px 0.3px #000000;font-size: small;margin-top: 0px;/* border: none; */border-left-style: none;border-right-style: none;border-bottom-style: none;border: none;" data-toggle="tooltip" data-placement="top" data-original-title="Copy leaderboard (L)">Copy</a>'+
                                  '<a id="og-reconnect-btn" class="btn btn-info btn-sm icon-loop2" title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Change server (+)" style="'+
-                                 'width: 33.3%;'+
-                                 'text-shadow: 0.3px 0.3px #000000;' +
-                                 'font-size: small;' +
-                                 'margin-top: 0px;' +
-                                 'margin-top: 0px;' +
-                                 'border: none;' +
-                                 '"></a><input id="tempCopy" style="display: none;" value="">'+
+                                 'width: 33.3%; text-shadow: 0.3px 0.3px #000000; font-size: small; margin-top: 0px; margin-top: 0px; border: none;"></a>' +
+                                 '<div id="dropDown" class="hud" style="position: absolute; pointer-events: auto; width: 33%; height: 60px; left: 67px; padding: 0px; border-radius: 0px;">'+
+                                 '<a id="copyTKBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 100%;text-shadow: rgb(0, 0, 0) 0.3px 0.3px;font-size: small;margin-top: 0px;display: block;border: none;/* position: absolute; *//* right: 100px; *//* bottom: -30px; */" data-toggle="tooltip" data-placement="left" data-original-title="Copy token">TK</a>'+
+                                 '<a id="copyIPBtn" href="javascript:void(0);" class="btn btn-sm btn-copy-leaderboard btn-info" style="width: 100%;text-shadow: rgb(0, 0, 0) 0.3px 0.3px;font-size: small;margin-top: 0px;display: block;border: none;" data-toggle="tooltip" data-placement="left" data-original-title="Copy IP address">IP</a>'+
+                                 '</div>'+
+                                 '<input id="tempCopy" style="display: none;" value="">'+
                                  '</div>');
 
     $("#searchShortcut, #og-reconnect-btn").mouseenter(function(){
-        $("#copyLBBtn").hide();
-        $("#copyIPBtn").hide();
-        $("#copyLeaderboardBtn").show();
+        $("#dropDown").hide();
+        $("#copyLBBtn").text("Copy");
     });
 
-    $("#copyLeaderboardBtn").mouseenter(function(){
-        $(this).hide();
-        $("#copyLBBtn").show();
-        $("#copyIPBtn").show();
+    $("#copyLBBtn").mouseenter(function(){
+        $("#copyLBBtn").text("LB");
+        $("#dropDown").show(100);
     });
 
     $("#leaderboard-menu").mouseleave(function() {
-        if (!$('#copyLBBtn').is(':hover') && !$('#copyIPBtn').is(':hover')) {
-
-            $("#copyLBBtn").hide();
-            $("#copyIPBtn").hide();
-            $("#copyLeaderboardBtn").show();
-        }
+        $("#dropDown").hide();
+        $("#copyLBBtn").text("Copy");
     });
 
 
@@ -248,6 +239,10 @@ setTimeout(function(){
 
     $("#copyLBBtn").click(function() {
         copy(getLeaderboard());
+    });
+
+    $("#copyTKBtn").click(function() {
+        copy("http://agar.io/#" + currentToken);
     });
 
     $("#copyIPBtn").click(function() {
@@ -409,21 +404,24 @@ setTimeout(function(){
     });
 
     // hide party form
-    //var url = window.location.href;     // Returns full URL
-    /*if (url.length !== 21) {
+    var url = window.location.href;     // Returns full URL
+    if (url.length !== 21) {
         $("#ogario-party").hide();
-    }*/
+    }
 
-    /*$("#gamemode").change(function(){
+    $("#gamemode").change(function(){
         if ($("#gamemode").val() == ":party") {
             $("#ogario-party").show();
+            $("#joinPartyToken").val();
         } else {
             $("#ogario-party").hide();
         }
-    });*/
+    });
 
     $(document).ajaxComplete(function(event, xhr, settings) {
         //console.log(xhr);
+        //console.log(settings);
+
         if(xhr.responseJSON != null) {
             if (xhr.responseJSON.ip != null && xhr.responseJSON.hasOwnProperty('ip')){
                 currentIP = xhr.responseJSON.ip;
@@ -433,6 +431,23 @@ setTimeout(function(){
                 currentToken = xhr.responseJSON.token;
                 $("#joinPartyToken").val("agar.io/#" + currentToken);
             }
+
+
+        }
+
+        if (xhr.status == 200 && settings.url == "http://m.agar.io/getToken") {
+            toastr["info"]("Connected :)").css("width","210px");
+        }
+    });
+
+    $(document).ajaxError(function(event, xhr, settings) {
+        //console.log(xhr);
+        //console.log(event);
+        //console.log(settings);
+
+        if (xhr.status == 404 && settings.url == "http://m.agar.io/getToken") {
+            toastr["error"]("Invalid token or server closed :(").css("width","210px");
+            $('#helloContainer').attr('data-party-state', '0');
         }
     });
 
@@ -447,9 +462,15 @@ setTimeout(function(){
         var mode = getParameterByName("m", url);
         var searchStr = getParameterByName("search", url);
 
-        if (region && url.length !== 21) {
-            MC.setRegion(region);
-            MC.setGameMode(mode);
+        if (url.length == 21) {
+
+            currentToken = url.replace("http://agar.io/#", "");
+
+        } else{
+            if (region) {
+                MC.setRegion(region);
+                MC.setGameMode(mode);
+            }
         }
 
 
@@ -462,6 +483,8 @@ setTimeout(function(){
                 $("#searchInput").val(searchStr);
             }
         }
+
+
 
     }, 6000);
 
@@ -507,15 +530,39 @@ function validateNum(input, min, max) {
     return num >= min && num <= max && input === num.toString();
 }
 
+function joinToken(token) {
+
+    $("#joinPartyToken").val(token);
+    $("#join-party-btn").click();
+    $("#joinPartyToken").val("");
+
+}
+
 function searchHandler(searchStr){
 
     searchStr = searchStr.trim();
 
     if (searchIPHandler(searchStr)) {
         // is an IP
+    } else if (searchTKHandler(searchStr)) {
+        // is a token
     } else {
         searchPlayer(searchStr);
     }
+
+}
+
+function searchTKHandler(searchStr) {
+    searchStr = searchStr.trim();
+
+
+    if (searchStr.length == 21 && searchStr.startsWith("http://agar.io/#")) {
+
+        joinToken(searchStr.replace("http://agar.io/#", ""));
+    } else {
+        return false;
+    }
+    return true;
 
 }
 
