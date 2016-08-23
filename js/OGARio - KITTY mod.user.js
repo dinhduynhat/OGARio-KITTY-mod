@@ -446,7 +446,7 @@ setTimeout(function(){
         //console.log(settings);
 
         if (xhr.status == 404 && settings.url == "http://m.agar.io/getToken") {
-            toastr["error"]("Invalid token or server closed :(").css("width","210px");
+            toastr["error"]("Invalid token or server has closed :(").css("width","210px");
             $('#helloContainer').attr('data-party-state', '0');
         }
     });
